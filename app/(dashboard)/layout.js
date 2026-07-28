@@ -98,6 +98,7 @@ export default function DashboardLayout({ children }) {
       ...(isAdmin ? [{ href: '/customers', label: 'Customers', icon: '👥' }] : []),
       ...(isAdmin ? [{ href: '/invoices', label: 'Invoices', icon: '🧾' }] : []),
       ...(isAdmin ? [{ href: '/payments', label: 'Payments', icon: '👛' }] : []),
+      ...(isTech ? [{ href: '/queues', label: 'Bandwidth Queues', icon: '📶' }] : []),
       ...(isTech ? [{ href: '/pppoe-accounts', label: 'PPPoE Accounts', icon: '🔌' }] : []),
       ...(isTech ? [{ href: '/routers', label: 'Routers', icon: '🖥️' }] : []),
       ...(isSuperAdmin ? [{ href: '/audit-logs', label: 'Audit Logs', icon: '📋' }] : []),
@@ -269,6 +270,7 @@ function getPageTitle(path) {
     '/invoices': 'Invoices',
     '/payments': 'Payments',
     '/routers': 'Routers',
+    '/queues': 'Bandwidth Queues',
     '/pppoe-accounts': 'PPPoE Accounts',
     '/audit-logs': 'Audit Logs',
   }

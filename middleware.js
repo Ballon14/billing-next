@@ -18,6 +18,7 @@ const roleAccess = {
   '/invoices': ['SUPER_ADMIN', 'ADMIN'],
   '/payments': ['SUPER_ADMIN', 'ADMIN'],
   '/routers': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/queues': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
   '/pppoe-accounts': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
   '/audit-logs': ['SUPER_ADMIN'],
 }
