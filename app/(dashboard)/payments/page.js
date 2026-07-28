@@ -79,6 +79,7 @@ export default function PaymentsPage() {
             <option value="verified">Verified</option>
             <option value="rejected">Rejected</option>
           </select>
+          <button className="btn-action btn-edit" onClick={() => window.open('/api/export/payments', '_blank')}>📥 Export CSV</button>
           <button className="btn-action btn-add" onClick={async () => { await loadInvoices(); setForm({ invoice_id: '', amount: '', payment_method: '', reference: '', notes: '' }); setShowModal(true) }}>➕ Catat Pembayaran</button>
         </div>
       </div>

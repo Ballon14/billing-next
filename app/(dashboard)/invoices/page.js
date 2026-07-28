@@ -52,7 +52,10 @@ export default function InvoicesPage() {
     <div className="card">
       <div className="card-header">
         <h3>🧾 Invoices</h3>
-        <button className="btn-action btn-add" onClick={async () => { await loadCustomers(); setForm({ customer_id: '', invoice_number: '', amount: '', status: 'unpaid', due_date: '', period_start: '', period_end: '' }); setModal({ id: null, title: 'Buat Tagihan' }) }}>➕ Buat Tagihan</button>
+        <div className="card-header-actions">
+          <button className="btn-action btn-edit" onClick={() => window.open('/api/export/invoices', '_blank')}>📥 Export CSV</button>
+          <button className="btn-action btn-add" onClick={async () => { await loadCustomers(); setForm({ customer_id: '', invoice_number: '', amount: '', status: 'unpaid', due_date: '', period_start: '', period_end: '' }); setModal({ id: null, title: 'Buat Tagihan' }) }}>➕ Buat Tagihan</button>
+        </div>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">
