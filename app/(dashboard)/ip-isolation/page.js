@@ -55,7 +55,7 @@ export default function IpIsolationPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>🔒 IP Isolation</h3>
+        <h3><i className="fas fa-lock"></i> IP Isolation</h3>
         <span className="header-badge">{isolatedIps.length} isolated</span>
       </div>
       <div className="card-body">
@@ -66,7 +66,7 @@ export default function IpIsolationPage() {
               <input type="text" value={inputIp} onChange={e => setInputIp(e.target.value)} placeholder="192.168.1.100" required />
             </div>
             <div className="form-group" style={{ alignSelf: 'flex-end' }}>
-              <button type="submit" className="btn-submit" disabled={loading}>{loading ? '⏳' : '🔒 Isolate'}</button>
+              <button type="submit" className="btn-submit" disabled={loading}>{loading ? <i className="fas fa-hourglass-half"></i> : <><i className="fas fa-lock"></i> Isolate</>}</button>
             </div>
           </div>
         </form>
@@ -83,7 +83,7 @@ export default function IpIsolationPage() {
                 <tr key={i}>
                   <td><strong>{ip}</strong></td>
                   <td>
-                    <button className="btn-edit" onClick={() => handleUnisolate(ip)}>🔓 Unisolate</button>
+                    <button className="btn-edit" onClick={() => handleUnisolate(ip)}><i className="fas fa-lock-open"></i> Unisolate</button>
                   </td>
                 </tr>
               ))}

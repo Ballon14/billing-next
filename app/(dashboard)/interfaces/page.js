@@ -13,7 +13,7 @@ export default function InterfacesPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>🔗 Network Interfaces</h3>
+        <h3><i className="fas fa-link"></i> Network Interfaces</h3>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">

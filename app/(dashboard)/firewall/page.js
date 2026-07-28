@@ -22,7 +22,7 @@ export default function FirewallPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>🛡️ Firewall Rules</h3>
+        <h3><i className="fas fa-shield-halved"></i> Firewall Rules</h3>
       </div>
       <div className="card-body">
         <div className="tabs">

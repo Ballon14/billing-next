@@ -32,7 +32,7 @@ async function markInvoicePaid(invoiceId) {
 }
 
 export const POST = withRole('SUPER_ADMIN', 'ADMIN')(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const payment = await prisma.payment.findUnique({
     where: { id },
     include: { invoice: true },
@@ -63,7 +63,7 @@ export const POST = withRole('SUPER_ADMIN', 'ADMIN')(async (req, { params }) => 
 })
 
 export const PUT = withRole('SUPER_ADMIN', 'ADMIN')(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const body = await req.json().catch(() => ({}))
   const payment = await prisma.payment.findUnique({
     where: { id },

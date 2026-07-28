@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma.mjs"
 export const dynamic = 'force-dynamic'
 
 export const PUT = withAuth(validatePartial(packageSchema)(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const body = req.validated
   const original = await prisma.package.findUnique({ where: { id } })
   if (!original) return error('Package not found', 404)
@@ -36,7 +36,7 @@ export const PUT = withAuth(validatePartial(packageSchema)(async (req, { params 
 }))
 
 export const DELETE = withAuth(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const pkg = await prisma.package.findUnique({ where: { id } })
   if (!pkg) return error('Package not found', 404)
 

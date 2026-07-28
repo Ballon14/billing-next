@@ -47,28 +47,28 @@ export default function BillingDashboardPage() {
         <div className="stat-card cyan">
           <div className="stat-card-top">
             <span className="stat-label">Pelanggan Aktif</span>
-            <span>👥</span>
+            <i className="fas fa-users"></i>
           </div>
           <div className="stat-value">{data.activeCustomers || 0}</div>
         </div>
         <div className="stat-card green">
           <div className="stat-card-top">
             <span className="stat-label">Pendapatan Bulan Ini</span>
-            <span>💰</span>
+            <i className="fas fa-sack-dollar"></i>
           </div>
           <div className="stat-value">Rp {Number(data.monthlyRevenue || 0).toLocaleString('id-ID')}</div>
         </div>
         <div className="stat-card orange">
           <div className="stat-card-top">
             <span className="stat-label">Pendapatan Tertunda</span>
-            <span>⏳</span>
+            <i className="fas fa-hourglass-half"></i>
           </div>
           <div className="stat-value">Rp {Number(data.pendingRevenue || 0).toLocaleString('id-ID')}</div>
         </div>
         <div className="stat-card purple">
           <div className="stat-card-top">
             <span className="stat-label">Total Pelanggan</span>
-            <span>📊</span>
+            <i className="fas fa-chart-bar"></i>
           </div>
           <div className="stat-value">{data.totalCustomers || 0}</div>
         </div>
@@ -77,7 +77,7 @@ export default function BillingDashboardPage() {
       <div className="stats-grid" style={{ gridTemplateColumns: '2fr 1fr' }}>
         <div className="card">
           <div className="card-header">
-            <h3>💰 Pendapatan Bulanan ({new Date().getFullYear()})</h3>
+            <h3><i className="fas fa-sack-dollar"></i> Pendapatan Bulanan ({new Date().getFullYear()})</h3>
           </div>
           <div className="card-body">
             <div className="revenue-chart" style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 250, padding: '20px 0' }}>
@@ -98,7 +98,7 @@ export default function BillingDashboardPage() {
 
         <div className="card">
           <div className="card-header">
-            <h3>💳 Pembayaran Terbaru</h3>
+            <h3><i className="fas fa-credit-card"></i> Pembayaran Terbaru</h3>
             <Link href="/payments" style={{ fontSize: 12, color: 'var(--accent-cyan)', textDecoration: 'none' }}>Lihat Semua</Link>
           </div>
           <div className="card-body" style={{ padding: 0 }}>
@@ -130,7 +130,7 @@ export default function BillingDashboardPage() {
         <Link href="/customers" className="stat-card blue" style={{ textDecoration: 'none', cursor: 'pointer' }}>
           <div className="stat-card-top">
             <span className="stat-label">Pelanggan Aktif</span>
-            <span>✅</span>
+            <i className="fas fa-check-circle"></i>
           </div>
           <div className="stat-value">{data.activeCustomers || 0}</div>
           <div className="stat-sub">dari {data.totalCustomers || 0} total</div>
@@ -138,7 +138,7 @@ export default function BillingDashboardPage() {
         <Link href="/ip-isolation" className="stat-card red" style={{ textDecoration: 'none', cursor: 'pointer' }}>
           <div className="stat-card-top">
             <span className="stat-label">Diisolasi</span>
-            <span>🔒</span>
+            <i className="fas fa-lock"></i>
           </div>
           <div className="stat-value">{data.isolatedCustomers || 0}</div>
           <div className="stat-sub">pelanggan diblokir</div>

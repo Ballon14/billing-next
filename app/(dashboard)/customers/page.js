@@ -88,7 +88,7 @@ export default function CustomersPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>👥 Customers</h3>
+        <h3><i className="fas fa-users"></i> Customers</h3>
         <div className="card-header-actions">
           <input type="text" className="search-input" placeholder="Cari nama, PPPoE, phone..." value={search} onChange={e => setSearch(e.target.value)} />
           <select className="filter-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
@@ -99,7 +99,7 @@ export default function CustomersPage() {
             <option value="terminated">Terminated</option>
             <option value="isolated">Isolated</option>
           </select>
-          <button className="btn-action btn-add" onClick={() => openAdd()}>➕ Tambah Pelanggan</button>
+          <button className="btn-action btn-add" onClick={() => openAdd()}><i className="fas fa-plus"></i> Tambah Pelanggan</button>
         </div>
       </div>
       <div className="card-body">
@@ -149,7 +149,7 @@ export default function CustomersPage() {
           <div className="crud-modal-content crud-modal-wide">
             <div className="crud-modal-header">
               <h3>{modal.title}</h3>
-              <button className="crud-modal-close" onClick={() => setModal(null)}>✕</button>
+              <button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button>
             </div>
             <form className="crud-form" onSubmit={handleSubmit}>
               <div className="form-row">

@@ -26,7 +26,7 @@ export default function AuditLogsPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>📜 Audit Logs</h3>
+        <h3><i className="fas fa-scroll"></i> Audit Logs</h3>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">

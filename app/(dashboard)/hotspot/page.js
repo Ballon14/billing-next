@@ -44,7 +44,7 @@ export default function HotspotPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>📶 Hotspot Active Users</h3>
+        <h3><i className="fas fa-wifi"></i> Hotspot Active Users</h3>
         <span className="header-badge">{data.length} active</span>
       </div>
       {data.length > 0 && (

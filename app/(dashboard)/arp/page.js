@@ -19,7 +19,7 @@ export default function ArpPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>📡 ARP Table</h3>
+        <h3><i className="fas fa-satellite"></i> ARP Table</h3>
         <span className="header-badge">{data.length} entries</span>
       </div>
       <div className="card-body">

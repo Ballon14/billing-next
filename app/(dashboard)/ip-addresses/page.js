@@ -19,7 +19,7 @@ export default function IpAddressesPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>🌐 IP Addresses</h3>
+        <h3><i className="fas fa-globe"></i> IP Addresses</h3>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">

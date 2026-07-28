@@ -41,12 +41,12 @@ export default function PortalPaymentsPage() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: 24, color: 'var(--text-primary)' }}>👛 Pembayaran</h2>
+      <h2 style={{ marginBottom: 24, color: 'var(--text-primary)' }}><i className="fas fa-wallet"></i> Pembayaran</h2>
 
       <div className="card" style={{ marginBottom: 20 }}>
         <div className="card-header">
           <h3>Riwayat Pembayaran</h3>
-          <button className="btn-action btn-add" onClick={() => setShowPay(true)} disabled={invoices.length === 0}>➕ Bayar Tagihan</button>
+          <button className="btn-action btn-add" onClick={() => setShowPay(true)} disabled={invoices.length === 0}><i className="fas fa-plus"></i> Bayar Tagihan</button>
         </div>
         <div className="card-body">
           <div className="data-table-wrapper">
@@ -73,7 +73,7 @@ export default function PortalPaymentsPage() {
       {showPay && (
         <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setShowPay(false)}>
           <div className="crud-modal-content">
-            <div className="crud-modal-header"><h3>Bayar Tagihan</h3><button className="crud-modal-close" onClick={() => setShowPay(false)}>✕</button></div>
+            <div className="crud-modal-header"><h3>Bayar Tagihan</h3><button className="crud-modal-close" onClick={() => setShowPay(false)}><i className="fas fa-xmark"></i></button></div>
             <form className="crud-form" onSubmit={handlePay}>
               <div className="form-group">
                 <label>Pilih Tagihan</label>

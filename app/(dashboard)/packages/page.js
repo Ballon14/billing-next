@@ -58,9 +58,9 @@ export default function PackagesPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>💳 Packages</h3>
+        <h3><i className="fas fa-credit-card"></i> Packages</h3>
         <button className="btn-action btn-add" onClick={() => { setForm({ name: '', price: '', speed: '', description: '', billing_period: 'monthly' }); setModal({ id: null, title: 'Tambah Paket' }) }}>
-          ➕ Tambah Paket
+          <i className="fas fa-plus"></i> Tambah Paket
         </button>
       </div>
       <div className="card-body">
@@ -116,7 +116,7 @@ export default function PackagesPage() {
           <div className="crud-modal-content">
             <div className="crud-modal-header">
               <h3>{modal.title}</h3>
-              <button className="crud-modal-close" onClick={() => setModal(null)}>✕</button>
+              <button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button>
             </div>
             <form className="crud-form" onSubmit={handleSubmit}>
               <div className="form-group">

@@ -1,1 +1,4 @@
-export { handlers as GET, handlers as POST } from "@/lib/auth.mjs"
+import { handlers } from "@/lib/auth.mjs"
+
+export const GET = handlers.GET
+export const POST = handlers.POST

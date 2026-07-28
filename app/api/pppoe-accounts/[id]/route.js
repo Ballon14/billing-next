@@ -7,7 +7,7 @@ import prisma from "@/lib/prisma.mjs"
 export const dynamic = 'force-dynamic'
 
 export const PUT = withAuth(validatePartial(pppoeAccountSchema)(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const body = req.validated
   const original = await prisma.pppoeAccount.findUnique({ where: { id } })
   if (!original) return error('PPPoE account not found', 404)
@@ -46,7 +46,7 @@ export const PUT = withAuth(validatePartial(pppoeAccountSchema)(async (req, { pa
 }))
 
 export const DELETE = withAuth(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const account = await prisma.pppoeAccount.findUnique({
     where: { id },
     include: { router: true },

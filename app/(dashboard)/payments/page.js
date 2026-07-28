@@ -71,7 +71,7 @@ export default function PaymentsPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>👛 Payments</h3>
+        <h3><i className="fas fa-wallet"></i> Payments</h3>
         <div className="card-header-actions">
           <select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ padding: '6px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-primary)', fontSize: 13 }}>
             <option value="">Semua Status</option>
@@ -79,8 +79,8 @@ export default function PaymentsPage() {
             <option value="verified">Verified</option>
             <option value="rejected">Rejected</option>
           </select>
-          <button className="btn-action btn-edit" onClick={() => window.open('/api/export/payments', '_blank')}>📥 Export CSV</button>
-          <button className="btn-action btn-add" onClick={async () => { await loadInvoices(); setForm({ invoice_id: '', amount: '', payment_method: '', reference: '', notes: '' }); setShowModal(true) }}>➕ Catat Pembayaran</button>
+          <button className="btn-action btn-edit" onClick={() => window.open('/api/export/payments', '_blank')}><i className="fas fa-download"></i> Export CSV</button>
+          <button className="btn-action btn-add" onClick={async () => { await loadInvoices(); setForm({ invoice_id: '', amount: '', payment_method: '', reference: '', notes: '' }); setShowModal(true) }}><i className="fas fa-plus"></i> Catat Pembayaran</button>
         </div>
       </div>
       <div className="card-body">
@@ -99,7 +99,7 @@ export default function PaymentsPage() {
                   <td>{p.paymentMethod || '-'}</td>
                   <td><span className={`badge badge-${p.status === 'verified' ? 'success' : p.status === 'rejected' ? 'error' : 'warning'}`}>{p.status}</span></td>
                   <td>{p.paidAt ? new Date(p.paidAt).toLocaleDateString('id-ID') : '-'}</td>
-                  <td>{p.status === 'pending' ? <div className="table-actions"><button className="btn-sm btn-success" onClick={() => verifyPayment(p.id)}>✔</button><button className="btn-sm btn-danger" onClick={() => rejectPayment(p.id)}>✕</button></div> : '-'}</td>
+                  <td>{p.status === 'pending' ? <div className="table-actions"><button className="btn-sm btn-success" onClick={() => verifyPayment(p.id)}><i className="fas fa-check"></i></button><button className="btn-sm btn-danger" onClick={() => rejectPayment(p.id)}><i className="fas fa-xmark"></i></button></div> : '-'}</td>
                 </tr>
               ))}
             </tbody>
@@ -120,7 +120,7 @@ export default function PaymentsPage() {
       {showModal && (
         <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setShowModal(false)}>
           <div className="crud-modal-content">
-            <div className="crud-modal-header"><h3>Catat Pembayaran</h3><button className="crud-modal-close" onClick={() => setShowModal(false)}>✕</button></div>
+            <div className="crud-modal-header"><h3>Catat Pembayaran</h3><button className="crud-modal-close" onClick={() => setShowModal(false)}><i className="fas fa-xmark"></i></button></div>
             <form className="crud-form" onSubmit={handleSubmit}>
               <div className="form-group"><label>Invoice</label><select value={form.invoice_id} onChange={e => setForm({...form, invoice_id: e.target.value})} required><option value="">— Pilih Invoice —</option>{invoices.map(i => <option key={i.id} value={i.id}>{i.invoiceNumber} - {i.customer?.name} (Rp {Number(i.amount).toLocaleString('id-ID')})</option>)}</select></div>
               <div className="form-group"><label>Amount</label><input type="number" step="0.01" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} required /></div>

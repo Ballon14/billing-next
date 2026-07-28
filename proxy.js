@@ -24,7 +24,7 @@ const roleAccess = {
   '/audit-logs': ['SUPER_ADMIN'],
 }
 
-export async function middleware(req) {
+export async function proxy(req) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   const { pathname } = req.nextUrl
 

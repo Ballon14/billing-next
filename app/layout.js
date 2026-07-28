@@ -1,3 +1,4 @@
+import './globals.css'
 import AuthProvider from '@/components/AuthProvider'
 
 export default function RootLayout({ children }) {
@@ -8,6 +9,7 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="theme-color" content="#0a0e1a" />
         <meta name="description" content="MikroTik Router Billing & Monitoring Dashboard" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
         <title>MikroTik Dashboard</title>
       </head>
       <body>

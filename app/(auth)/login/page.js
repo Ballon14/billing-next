@@ -44,7 +44,7 @@ export default function LoginPage() {
       <div style={{ width: '100%', maxWidth: '400px' }}>
         <div className="login-card">
           <div className="login-logo">
-            <div className="login-logo-icon">📡</div>
+            <div className="login-logo-icon"><i className="fas fa-satellite"></i></div>
             <h1>MikroTik</h1>
             <span>Billing & Monitor Dashboard</span>
           </div>

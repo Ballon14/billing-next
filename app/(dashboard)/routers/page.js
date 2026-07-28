@@ -38,8 +38,8 @@ export default function RoutersPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>🌐 Routers</h3>
-        <button className="btn-action btn-add" onClick={() => { setForm({ name: '', host: '', port: '8728', username: '', password: '', is_active: true }); setModal({ id: null, title: 'Tambah Router' }) }}>➕ Tambah Router</button>
+        <h3><i className="fas fa-globe"></i> Routers</h3>
+        <button className="btn-action btn-add" onClick={() => { setForm({ name: '', host: '', port: '8728', username: '', password: '', is_active: true }); setModal({ id: null, title: 'Tambah Router' }) }}><i className="fas fa-plus"></i> Tambah Router</button>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">
@@ -78,7 +78,7 @@ export default function RoutersPage() {
       {modal && (
         <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setModal(null)}>
           <div className="crud-modal-content">
-            <div className="crud-modal-header"><h3>{modal.title}</h3><button className="crud-modal-close" onClick={() => setModal(null)}>✕</button></div>
+            <div className="crud-modal-header"><h3>{modal.title}</h3><button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button></div>
             <form className="crud-form" onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group"><label>Name</label><input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required /></div>

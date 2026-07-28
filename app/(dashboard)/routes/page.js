@@ -19,7 +19,7 @@ export default function RoutesPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>🗺️ Routing Table</h3>
+        <h3><i className="fas fa-map"></i> Routing Table</h3>
         <span className="header-badge">{data.length} routes</span>
       </div>
       <div className="card-body">

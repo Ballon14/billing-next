@@ -4,14 +4,14 @@ import { updateFirewallFilter, deleteFirewallFilter } from "@/lib/mikrotik-servi
 export const dynamic = 'force-dynamic'
 
 export const PUT = withAuth(async (req, { params }) => {
-  const id = params.id
+  const { id } = await params
   const body = await getBody(req)
   await updateFirewallFilter(id, body)
   return success({ message: 'Filter rule updated' })
 })
 
 export const DELETE = withAuth(async (req, { params }) => {
-  const id = params.id
+  const { id } = await params
   if (!id) return error('Rule ID required')
   await deleteFirewallFilter(id)
   return success({ message: 'Filter rule deleted' })

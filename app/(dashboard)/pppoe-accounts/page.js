@@ -60,8 +60,8 @@ export default function PppoeAccountsPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>🔌 PPPoE Accounts</h3>
-        <button className="btn-action btn-add" onClick={async () => { await loadRelated(); setForm({ customer_id: '', username: '', password: '', service: 'pppoe', remote_address: '', profile: 'default', router_id: '', status: 'disabled' }); setModal({ id: null, title: 'Tambah Akun PPPoE' }) }}>➕ Tambah Akun</button>
+        <h3><i className="fas fa-plug"></i> PPPoE Accounts</h3>
+        <button className="btn-action btn-add" onClick={async () => { await loadRelated(); setForm({ customer_id: '', username: '', password: '', service: 'pppoe', remote_address: '', profile: 'default', router_id: '', status: 'disabled' }); setModal({ id: null, title: 'Tambah Akun PPPoE' }) }}><i className="fas fa-plus"></i> Tambah Akun</button>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">
@@ -78,7 +78,7 @@ export default function PppoeAccountsPage() {
                   <td>{a.profile}</td>
                   <td><span className={`status-badge ${a.isActive ? 'success' : 'warning'}`}>{a.isActive ? 'Active' : 'Disabled'}</span></td>
                   <td>{a.router?.name || '-'}</td>
-                  <td><button className="btn-edit" onClick={() => handleSync(a.id)} disabled={syncing.has(a.id)}>{syncing.has(a.id) ? '⏳' : '🔄'}</button></td>
+                  <td><button className="btn-edit" onClick={() => handleSync(a.id)} disabled={syncing.has(a.id)}>{syncing.has(a.id) ? <i className="fas fa-hourglass-half"></i> : <i className="fas fa-rotate"></i>}</button></td>
                   <td>
                     <button className="btn-edit" onClick={async () => { await loadRelated(); setForm({ customer_id: String(a.customerId), username: a.username, password: '', service: a.service, remote_address: a.remoteAddress || '', profile: a.profile, router_id: a.routerId ? String(a.routerId) : '', status: a.isActive ? 'enabled' : 'disabled' }); setModal({ id: a.id, title: 'Edit Akun PPPoE' }) }}>Edit</button>
                     <button className="btn-delete" style={{ marginLeft: 4 }} onClick={async () => { if (confirm('Hapus akun PPPoE?')) { await apiDelete(`/api/pppoe-accounts/${a.id}`); load() } }}>Hapus</button>
@@ -103,7 +103,7 @@ export default function PppoeAccountsPage() {
       {modal && (
         <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setModal(null)}>
           <div className="crud-modal-content crud-modal-wide">
-            <div className="crud-modal-header"><h3>{modal.title}</h3><button className="crud-modal-close" onClick={() => setModal(null)}>✕</button></div>
+            <div className="crud-modal-header"><h3>{modal.title}</h3><button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button></div>
             <form className="crud-form" onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group"><label>Username</label><input type="text" value={form.username} onChange={e => setForm({...form, username: e.target.value})} required /></div>

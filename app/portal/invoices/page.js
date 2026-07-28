@@ -20,7 +20,7 @@ export default function PortalInvoicesPage() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: 24, color: 'var(--text-primary)' }}>🧾 Tagihan Saya</h2>
+      <h2 style={{ marginBottom: 24, color: 'var(--text-primary)' }}><i className="fas fa-file-invoice"></i> Tagihan Saya</h2>
       <div className="card">
         <div className="card-body">
           <div className="data-table-wrapper">

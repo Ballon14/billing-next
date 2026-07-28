@@ -51,10 +51,10 @@ export default function InvoicesPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>🧾 Invoices</h3>
+        <h3><i className="fas fa-file-invoice"></i> Invoices</h3>
         <div className="card-header-actions">
-          <button className="btn-action btn-edit" onClick={() => window.open('/api/export/invoices', '_blank')}>📥 Export CSV</button>
-          <button className="btn-action btn-add" onClick={async () => { await loadCustomers(); setForm({ customer_id: '', invoice_number: '', amount: '', status: 'unpaid', due_date: '', period_start: '', period_end: '' }); setModal({ id: null, title: 'Buat Tagihan' }) }}>➕ Buat Tagihan</button>
+          <button className="btn-action btn-edit" onClick={() => window.open('/api/export/invoices', '_blank')}><i className="fas fa-download"></i> Export CSV</button>
+          <button className="btn-action btn-add" onClick={async () => { await loadCustomers(); setForm({ customer_id: '', invoice_number: '', amount: '', status: 'unpaid', due_date: '', period_start: '', period_end: '' }); setModal({ id: null, title: 'Buat Tagihan' }) }}><i className="fas fa-plus"></i> Buat Tagihan</button>
         </div>
       </div>
       <div className="card-body">
@@ -92,7 +92,7 @@ export default function InvoicesPage() {
       {modal && (
         <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setModal(null)}>
           <div className="crud-modal-content crud-modal-wide">
-            <div className="crud-modal-header"><h3>{modal.title}</h3><button className="crud-modal-close" onClick={() => setModal(null)}>✕</button></div>
+            <div className="crud-modal-header"><h3>{modal.title}</h3><button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button></div>
             <form className="crud-form" onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group"><label>Invoice Number</label><input type="text" value={form.invoice_number} onChange={e => setForm({...form, invoice_number: e.target.value})} required /></div>

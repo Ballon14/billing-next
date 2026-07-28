@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 const adminOnly = withRole('SUPER_ADMIN', 'ADMIN')
 
 export const GET = withRole('SUPER_ADMIN', 'ADMIN', 'TECHNICIAN')(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const customer = await prisma.customer.findUnique({
     where: { id },
     include: {
@@ -23,7 +23,7 @@ export const GET = withRole('SUPER_ADMIN', 'ADMIN', 'TECHNICIAN')(async (req, { 
 })
 
 export const PUT = adminOnly(validatePartial(customerSchema)(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const body = req.validated
   const customer = await prisma.customer.findUnique({
     where: { id },
@@ -92,7 +92,7 @@ export const PUT = adminOnly(validatePartial(customerSchema)(async (req, { param
 }))
 
 export const DELETE = adminOnly(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const customer = await prisma.customer.findUnique({
     where: { id },
     include: { pppoeAccounts: true },

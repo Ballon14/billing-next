@@ -73,8 +73,8 @@ export default function PppProfilesPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>📋 PPPoE Profiles</h3>
-        <button className="btn-action btn-add" onClick={openAdd}>➕ Tambah Profile</button>
+        <h3><i className="fas fa-clipboard-list"></i> PPPoE Profiles</h3>
+        <button className="btn-action btn-add" onClick={openAdd}><i className="fas fa-plus"></i> Tambah Profile</button>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">
@@ -106,7 +106,7 @@ export default function PppProfilesPage() {
       {showModal && (
         <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setShowModal(false)}>
           <div className="crud-modal-content">
-            <div className="crud-modal-header"><h3>{editProfile ? 'Edit Profile' : 'Tambah Profile'}</h3><button className="crud-modal-close" onClick={() => setShowModal(false)}>✕</button></div>
+            <div className="crud-modal-header"><h3>{editProfile ? 'Edit Profile' : 'Tambah Profile'}</h3><button className="crud-modal-close" onClick={() => setShowModal(false)}><i className="fas fa-xmark"></i></button></div>
             <form className="crud-form" onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group"><label>Name</label><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required /></div>

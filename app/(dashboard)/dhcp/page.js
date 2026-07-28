@@ -65,9 +65,9 @@ export default function DhcpPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>📋 DHCP Server Leases</h3>
+        <h3><i className="fas fa-clipboard-list"></i> DHCP Server Leases</h3>
         <button className="btn-action btn-add" onClick={() => { setForm({ address: '', macAddress: '', server: '', comment: '' }); setModal({ id: null, title: 'Add DHCP Lease' }) }}>
-          ➕ Add Lease
+          <i className="fas fa-plus"></i> Add Lease
         </button>
       </div>
       <div className="card-body">
@@ -94,18 +94,18 @@ export default function DhcpPage() {
                     <td>{lease.hostName || '-'}</td>
                     <td>
                       {lease.address || '-'}
-                      {isIsolated ? <span className="badge badge-isolated" style={{ marginLeft: 6 }}>🔒 Isolated</span> : ''}
+                      {isIsolated ? <span className="badge badge-isolated" style={{ marginLeft: 6 }}><i className="fas fa-lock"></i> Isolated</span> : ''}
                     </td>
                     <td>{lease.macAddress || '-'}</td>
                     <td>{lease.server || '-'}</td>
                     <td><span className={`badge ${lease.status === 'bound' ? 'badge-bound' : 'badge-inactive'}`}><span className="badge-dot"></span>{lease.status || 'unknown'}</span></td>
                     <td>{lease.lastSeen || '-'}</td>
                     <td className="actions-cell">
-                      <button className="btn-icon btn-edit" onClick={() => openEdit(lease, lease['.id'] || lease.id)}>✏️</button>
-                      <button className="btn-icon btn-delete-icon" onClick={() => handleDelete(lease['.id'] || lease.id)}>🗑️</button>
+                      <button className="btn-icon btn-edit" onClick={() => openEdit(lease, lease['.id'] || lease.id)}><i className="fas fa-pen-to-square"></i></button>
+                      <button className="btn-icon btn-delete-icon" onClick={() => handleDelete(lease['.id'] || lease.id)}><i className="fas fa-trash"></i></button>
                       {!isIsolated
-                        ? <button className="btn-icon" style={{ color: 'var(--accent-yellow)' }} onClick={() => quickIsolate(lease.address)}>🔒</button>
-                        : <button className="btn-icon" style={{ color: 'var(--accent-green)' }} onClick={() => quickUnisolate(lease.address)}>🔓</button>
+                        ? <button className="btn-icon" style={{ color: 'var(--accent-yellow)' }} onClick={() => quickIsolate(lease.address)}><i className="fas fa-lock"></i></button>
+                        : <button className="btn-icon" style={{ color: 'var(--accent-green)' }} onClick={() => quickUnisolate(lease.address)}><i className="fas fa-lock-open"></i></button>
                       }
                     </td>
                   </tr>
@@ -132,7 +132,7 @@ export default function DhcpPage() {
           <div className="crud-modal-content">
             <div className="crud-modal-header">
               <h3>{modal.title}</h3>
-              <button className="crud-modal-close" onClick={() => setModal(null)}>✕</button>
+              <button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button>
             </div>
             <form className="crud-form" onSubmit={handleSubmit}>
               <div className="form-group">

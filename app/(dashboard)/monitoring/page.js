@@ -62,15 +62,15 @@ export default function OverviewPage() {
     <>
       <div className="stats-grid">
         {[
-          { label: 'CPU Load', value: cpuLoad + '%', pct: cpuLoad, color: cpuLoad > 80 ? 'red' : cpuLoad > 50 ? 'cyan' : 'green', icon: '🖥️' },
-          { label: 'RAM Usage', value: ramPercent + '%', sub: `${fmtBytes(usedMem)} / ${fmtBytes(totalMem)}`, pct: ramPercent, color: ramPercent > 80 ? 'red' : ramPercent > 50 ? 'cyan' : 'green', icon: '🧠' },
-          { label: 'Storage', value: hddPercent + '%', sub: `${fmtBytes(usedHdd)} / ${fmtBytes(totalHdd)}`, pct: hddPercent, color: hddPercent > 90 ? 'red' : hddPercent > 70 ? 'cyan' : 'green', icon: '💾' },
-          { label: 'Uptime', value: (r.uptime || '-').replace(/w/g,'w ').replace(/d/g,'d ').replace(/h/g,'h ').replace(/m/g,'m '), icon: '⏰' },
+          { label: 'CPU Load', value: cpuLoad + '%', pct: cpuLoad, color: cpuLoad > 80 ? 'red' : cpuLoad > 50 ? 'cyan' : 'green', icon: 'fa-microchip' },
+          { label: 'RAM Usage', value: ramPercent + '%', sub: `${fmtBytes(usedMem)} / ${fmtBytes(totalMem)}`, pct: ramPercent, color: ramPercent > 80 ? 'red' : ramPercent > 50 ? 'cyan' : 'green', icon: 'fa-brain' },
+          { label: 'Storage', value: hddPercent + '%', sub: `${fmtBytes(usedHdd)} / ${fmtBytes(totalHdd)}`, pct: hddPercent, color: hddPercent > 90 ? 'red' : hddPercent > 70 ? 'cyan' : 'green', icon: 'fa-hard-drive' },
+          { label: 'Uptime', value: (r.uptime || '-').replace(/w/g,'w ').replace(/d/g,'d ').replace(/h/g,'h ').replace(/m/g,'m '), icon: 'fa-clock' },
         ].map((s, i) => (
           <div key={i} className={`stat-card ${s.color || 'blue'}`}>
             <div className="stat-card-top">
               <span className="stat-label">{s.label}</span>
-              <span>{s.icon}</span>
+              <i className={`fas ${s.icon}`}></i>
             </div>
             <div className="stat-value">{s.value}</div>
             {s.sub && <div className="stat-sub">{s.sub}</div>}
@@ -85,7 +85,7 @@ export default function OverviewPage() {
 
       <div className="card">
         <div className="card-header">
-          <h3>ℹ️ System Information</h3>
+          <h3><i className="fas fa-circle-info"></i> System Information</h3>
         </div>
         <div className="card-body">
           <div className="info-grid">
@@ -109,7 +109,7 @@ export default function OverviewPage() {
       <div className="charts-grid">
         <div className="chart-card">
           <div className="chart-header">
-            <h3>🌐 Uplink</h3>
+            <h3><i className="fas fa-globe"></i> Uplink</h3>
             <span className="chart-status">{charts.uplink.length} samples</span>
           </div>
           <div className="chart-body">
@@ -135,7 +135,7 @@ export default function OverviewPage() {
 
         <div className="chart-card">
           <div className="chart-header">
-            <h3>🔗 Bridge</h3>
+            <h3><i className="fas fa-link"></i> Bridge</h3>
             <span className="chart-status">{charts.bridge.length} samples</span>
           </div>
           <div className="chart-body">

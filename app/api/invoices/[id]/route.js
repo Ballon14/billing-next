@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma.mjs"
 export const dynamic = 'force-dynamic'
 
 export const PUT = withAuth(validatePartial(invoiceSchema)(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const body = req.validated
   const original = await prisma.invoice.findUnique({ where: { id } })
   if (!original) return error('Invoice not found', 404)
@@ -46,7 +46,7 @@ export const PUT = withAuth(validatePartial(invoiceSchema)(async (req, { params 
 }))
 
 export const DELETE = withAuth(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const invoice = await prisma.invoice.findUnique({ where: { id } })
   if (!invoice) return error('Invoice not found', 404)
 

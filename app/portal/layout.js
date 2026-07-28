@@ -27,20 +27,20 @@ export default function PortalLayout({ children }) {
   if (status === 'unauthenticated') { router.push('/login'); return null }
 
   const navItems = [
-    { href: '/portal', label: 'Dashboard', icon: '🏠' },
-    { href: '/portal/invoices', label: 'Tagihan Saya', icon: '🧾' },
-    { href: '/portal/payments', label: 'Pembayaran', icon: '👛' },
+    { href: '/portal', label: 'Dashboard', icon: 'fa-home' },
+    { href: '/portal/invoices', label: 'Tagihan Saya', icon: 'fa-file-invoice' },
+    { href: '/portal/payments', label: 'Pembayaran', icon: 'fa-wallet' },
   ]
 
   return (
     <div className="portal-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 24px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-card)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 24 }}>📡</span>
+          <i className="fas fa-satellite" style={{ fontSize: 24 }}></i>
           <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Customer Portal</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button className="theme-toggle-btn" onClick={() => setDarkMode(!darkMode)}>{darkMode ? '☀️' : '🌙'}</button>
+          <button className="theme-toggle-btn" onClick={() => setDarkMode(!darkMode)}><i className={`fas ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i></button>
           <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{session?.user?.name}</span>
         </div>
       </header>
@@ -53,7 +53,7 @@ export default function PortalLayout({ children }) {
               textDecoration: 'none', fontSize: 13,
               background: pathname === item.href ? 'rgba(56,189,248,0.1)' : 'transparent',
             }}>
-              <span>{item.icon}</span>
+              <i className={`fas ${item.icon}`}></i>
               <span>{item.label}</span>
             </Link>
           ))}

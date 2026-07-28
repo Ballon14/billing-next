@@ -7,7 +7,7 @@ import prisma from "@/lib/prisma.mjs"
 export const dynamic = 'force-dynamic'
 
 export const PUT = withAuth(validatePartial(routerSchema)(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const body = req.validated
   const original = await prisma.router.findUnique({ where: { id } })
   if (!original) return error('Router not found', 404)
@@ -41,7 +41,7 @@ export const PUT = withAuth(validatePartial(routerSchema)(async (req, { params }
 }))
 
 export const DELETE = withAuth(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const router = await prisma.router.findUnique({ where: { id } })
   if (!router) return error('Router not found', 404)
 

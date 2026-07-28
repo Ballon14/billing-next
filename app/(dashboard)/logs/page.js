@@ -43,7 +43,7 @@ export default function LogsPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>📄 System Logs</h3>
+        <h3><i className="fas fa-file-lines"></i> System Logs</h3>
         <span className="header-badge">{data.length} entries</span>
       </div>
       <div className="card-body">

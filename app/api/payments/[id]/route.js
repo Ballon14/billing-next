@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma.mjs"
 export const dynamic = 'force-dynamic'
 
 export const DELETE = withAuth(async (req, { params }) => {
-  const id = parseInt(params.id)
+  const p = await params; const id = parseInt(p.id)
   const payment = await prisma.payment.findUnique({ where: { id } })
   if (!payment) return error('Payment not found', 404)
 

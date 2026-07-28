@@ -4,6 +4,6 @@ import { getInterface } from "@/lib/mikrotik-service.mjs"
 export const dynamic = 'force-dynamic'
 
 export async function GET(req, { params }) {
-  const name = params.name
+  const { name } = await params
   return success(getInterface(name))
 }

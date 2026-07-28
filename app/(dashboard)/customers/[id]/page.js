@@ -85,10 +85,10 @@ export default function CustomerDetailPage() {
     <div className="customer-detail">
       <div className="card">
         <div className="card-header">
-          <h3>👤 {customer.name}</h3>
+          <h3><i className="fas fa-user"></i> {customer.name}</h3>
           <div className="card-header-actions">
-            <button className="btn-action btn-edit" onClick={() => { loadPackages(); setEditing(true) }}>✏️ Edit</button>
-            <button className="btn-action btn-delete" onClick={handleDelete}>🗑️ Hapus</button>
+            <button className="btn-action btn-edit" onClick={() => { loadPackages(); setEditing(true) }}><i className="fas fa-pen-to-square"></i> Edit</button>
+            <button className="btn-action btn-delete" onClick={handleDelete}><i className="fas fa-trash"></i> Hapus</button>
           </div>
         </div>
         <div className="card-body">
@@ -105,7 +105,7 @@ export default function CustomerDetailPage() {
       </div>
 
       <div className="card">
-        <div className="card-header"><h3>🔌 PPPoE Accounts</h3></div>
+        <div className="card-header"><h3><i className="fas fa-plug"></i> PPPoE Accounts</h3></div>
         <div className="card-body">
           <div className="data-table-wrapper">
             <table className="data-table">
@@ -128,7 +128,7 @@ export default function CustomerDetailPage() {
       </div>
 
       <div className="card">
-        <div className="card-header"><h3>🧾 Invoices</h3></div>
+        <div className="card-header"><h3><i className="fas fa-file-invoice"></i> Invoices</h3></div>
         <div className="card-body">
           <div className="data-table-wrapper">
             <table className="data-table">
@@ -154,7 +154,7 @@ export default function CustomerDetailPage() {
       {editing && (
         <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setEditing(false)}>
           <div className="crud-modal-content">
-            <div className="crud-modal-header"><h3>✏️ Edit Customer</h3><button className="crud-modal-close" onClick={() => setEditing(false)}>✕</button></div>
+            <div className="crud-modal-header"><h3><i className="fas fa-pen-to-square"></i> Edit Customer</h3><button className="crud-modal-close" onClick={() => setEditing(false)}><i className="fas fa-xmark"></i></button></div>
             <form className="crud-form" onSubmit={handleSave}>
               <div className="form-group"><label>Name</label><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required /></div>
               <div className="form-row">

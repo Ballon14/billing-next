@@ -90,8 +90,8 @@ export default function QueuesPage() {
   return (
     <div className="card">
       <div className="card-header">
-        <h3>📶 Bandwidth Queues</h3>
-        <button className="btn-action btn-add" onClick={openAdd}>➕ Tambah Queue</button>
+        <h3><i className="fas fa-wifi"></i> Bandwidth Queues</h3>
+        <button className="btn-action btn-add" onClick={openAdd}><i className="fas fa-plus"></i> Tambah Queue</button>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">
@@ -123,7 +123,7 @@ export default function QueuesPage() {
       {showModal && (
         <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setShowModal(false)}>
           <div className="crud-modal-content">
-            <div className="crud-modal-header"><h3>{editQueue ? 'Edit Queue' : 'Tambah Queue'}</h3><button className="crud-modal-close" onClick={() => setShowModal(false)}>✕</button></div>
+            <div className="crud-modal-header"><h3>{editQueue ? 'Edit Queue' : 'Tambah Queue'}</h3><button className="crud-modal-close" onClick={() => setShowModal(false)}><i className="fas fa-xmark"></i></button></div>
             <form className="crud-form" onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group"><label>Name</label><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required /></div>

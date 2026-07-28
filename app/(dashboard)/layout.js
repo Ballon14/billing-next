@@ -25,7 +25,7 @@ export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [routerName, setRouterName] = useState('MikroTik')
   const [connected, setConnected] = useState(false)
-  const [activeCounts, setActiveCounts] = useState({})
+  const [activeCounts, setActiveCounts] = useState(null)
   const [monthlyRevenue, setMonthlyRevenue] = useState('-')
   const [daemonHealthy, setDaemonHealthy] = useState(true)
   const [darkMode, setDarkMode] = useState(true)
@@ -93,32 +93,32 @@ export default function DashboardLayout({ children }) {
 
   const navItems = [
     { section: 'Billing System', items: [
-      ...(isAdmin ? [{ href: '/', label: 'Billing Dashboard', icon: '📊' }] : []),
-      ...(isAdmin ? [{ href: '/packages', label: 'Packages', icon: '💳' }] : []),
-      ...(isAdmin ? [{ href: '/customers', label: 'Customers', icon: '👥' }] : []),
-      ...(isAdmin ? [{ href: '/invoices', label: 'Invoices', icon: '🧾' }] : []),
-      ...(isAdmin ? [{ href: '/payments', label: 'Payments', icon: '👛' }] : []),
-      ...(isTech ? [{ href: '/queues', label: 'Bandwidth Queues', icon: '📶' }] : []),
-      ...(isTech ? [{ href: '/ppp-profiles', label: 'PPPoE Profiles', icon: '📋' }] : []),
-      ...(isTech ? [{ href: '/pppoe-accounts', label: 'PPPoE Accounts', icon: '🔌' }] : []),
-      ...(isTech ? [{ href: '/routers', label: 'Routers', icon: '🖥️' }] : []),
-      ...(isSuperAdmin ? [{ href: '/audit-logs', label: 'Audit Logs', icon: '📋' }] : []),
+      ...(isAdmin ? [{ href: '/', label: 'Billing Dashboard', icon: 'fa-chart-bar' }] : []),
+      ...(isAdmin ? [{ href: '/packages', label: 'Packages', icon: 'fa-credit-card' }] : []),
+      ...(isAdmin ? [{ href: '/customers', label: 'Customers', icon: 'fa-users' }] : []),
+      ...(isAdmin ? [{ href: '/invoices', label: 'Invoices', icon: 'fa-file-invoice' }] : []),
+      ...(isAdmin ? [{ href: '/payments', label: 'Payments', icon: 'fa-wallet' }] : []),
+      ...(isTech ? [{ href: '/queues', label: 'Bandwidth Queues', icon: 'fa-wifi' }] : []),
+      ...(isTech ? [{ href: '/ppp-profiles', label: 'PPPoE Profiles', icon: 'fa-clipboard-list' }] : []),
+      ...(isTech ? [{ href: '/pppoe-accounts', label: 'PPPoE Accounts', icon: 'fa-plug' }] : []),
+      ...(isTech ? [{ href: '/routers', label: 'Routers', icon: 'fa-server' }] : []),
+      ...(isSuperAdmin ? [{ href: '/audit-logs', label: 'Audit Logs', icon: 'fa-clipboard-list' }] : []),
     ].filter(Boolean)},
     { section: 'Monitoring', items: isTech ? [
-      { href: '/monitoring', label: 'System Overview', icon: '📈' },
-      { href: '/interfaces', label: 'Interfaces', icon: '🔗' },
-      { href: '/dhcp', label: 'DHCP Leases', icon: '📋' },
-      { href: '/arp', label: 'ARP Table', icon: '📡' },
+      { href: '/monitoring', label: 'System Overview', icon: 'fa-chart-line' },
+      { href: '/interfaces', label: 'Interfaces', icon: 'fa-link' },
+      { href: '/dhcp', label: 'DHCP Leases', icon: 'fa-clipboard-list' },
+      { href: '/arp', label: 'ARP Table', icon: 'fa-satellite' },
     ] : []},
     { section: 'Network', items: isTech ? [
-      { href: '/ip-addresses', label: 'IP Addresses', icon: '🌐' },
-      { href: '/routes', label: 'Routing Table', icon: '🗺️' },
-      { href: '/firewall', label: 'Firewall Rules', icon: '🛡️' },
-      { href: '/ip-isolation', label: 'IP Isolation', icon: '🔒' },
+      { href: '/ip-addresses', label: 'IP Addresses', icon: 'fa-globe' },
+      { href: '/routes', label: 'Routing Table', icon: 'fa-map' },
+      { href: '/firewall', label: 'Firewall Rules', icon: 'fa-shield-halved' },
+      { href: '/ip-isolation', label: 'IP Isolation', icon: 'fa-lock' },
     ] : []},
     { section: 'Services', items: isTech ? [
-      { href: '/hotspot', label: 'Hotspot Active', icon: '📶' },
-      { href: '/logs', label: 'System Logs', icon: '📄' },
+      { href: '/hotspot', label: 'Hotspot Active', icon: 'fa-wifi' },
+      { href: '/logs', label: 'System Logs', icon: 'fa-file-lines' },
     ] : []},
   ]
 
@@ -130,7 +130,7 @@ export default function DashboardLayout({ children }) {
         id="mobileToggle"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
-        {sidebarOpen ? '✕' : '☰'}
+        {sidebarOpen ? <i className="fas fa-xmark"></i> : <i className="fas fa-bars"></i>}
       </button>
       <div
         className="mobile-overlay"
@@ -146,7 +146,7 @@ export default function DashboardLayout({ children }) {
       <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <div className="sidebar-logo-icon">📡</div>
+            <div className="sidebar-logo-icon"><i className="fas fa-satellite"></i></div>
             <div className="sidebar-logo-text">
               <h1>MikroTik</h1>
               <span>Billing & Monitor</span>
@@ -173,7 +173,7 @@ export default function DashboardLayout({ children }) {
                   className={`nav-item ${isActive(item.href) ? 'active' : ''}`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <span className="nav-item-icon">{item.icon}</span>
+                  <i className={`nav-item-icon fas ${item.icon}`}></i>
                   <span>{item.label}</span>
                 </Link>
               ))}
@@ -188,7 +188,7 @@ export default function DashboardLayout({ children }) {
           </div>
           <div className="sidebar-footer-row">
             <button className="theme-toggle-btn" onClick={() => setDarkMode(!darkMode)} title={darkMode ? 'Light Mode' : 'Dark Mode'}>
-              {darkMode ? '☀️' : '🌙'}
+              <i className={`fas ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
             </button>
             <div className="refresh-indicator">
               <div className="refresh-spinner" id="refreshSpinner"></div>
@@ -201,7 +201,7 @@ export default function DashboardLayout({ children }) {
             className="sidebar-logout-btn"
             onClick={() => signOut({ callbackUrl: '/login' })}
           >
-            <span>🚪</span>
+            <i className="fas fa-right-from-bracket"></i>
             <span>Logout</span>
           </button>
         </div>
@@ -212,11 +212,11 @@ export default function DashboardLayout({ children }) {
         <div className="page-header">
           <h2 id="pageTitle">{getPageTitle(pathname)}</h2>
           <div className="header-actions">
-            <a href="/" className="header-billing-shortcut" style={{ display: activeCounts ? 'flex' : 'none' }}>
-              <span>👥</span>
+            <a href="/" className="header-billing-shortcut" style={{ display: activeCounts !== null ? 'flex' : 'none' }}>
+              <i className="fas fa-users"></i>
               <span className="shortcut-label">Aktif:</span>
               <span className="shortcut-value">{activeCounts}</span>
-              <span style={{ marginLeft: 8 }}>👛</span>
+              <i className="fas fa-wallet" style={{ marginLeft: 8 }}></i>
               <span className="shortcut-label">Bulan Ini:</span>
               <span className="shortcut-value">{monthlyRevenue}</span>
             </a>
@@ -227,7 +227,7 @@ export default function DashboardLayout({ children }) {
         <div className="page-content">
           {!daemonHealthy && (
             <div className="daemon-banner daemon-banner-warning" id="daemonWarningBanner">
-              <span>⚠️</span>
+              <i className="fas fa-triangle-exclamation"></i>
               <span>Daemon tidak terhubung ke router. Data monitoring tidak tersedia.</span>
             </div>
           )}
