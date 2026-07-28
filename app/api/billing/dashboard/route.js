@@ -35,12 +35,12 @@ export const GET = withAuth(async () => {
 
   // Monthly revenue data for the year (single query)
   const monthlyPaid = await prisma.$queryRawUnsafe(`
-    SELECT CAST(strftime('%m', paidAt) AS INTEGER) AS month,
+    SELECT MONTH(paidAt) AS month,
            COALESCE(SUM(amount), 0) AS total
-    FROM Invoice
+    FROM Payment
     WHERE status = 'paid'
       AND paidAt >= ? AND paidAt < ?
-    GROUP BY strftime('%m', paidAt)
+    GROUP BY MONTH(paidAt)
   `, new Date(currentYear, 0, 1), new Date(currentYear + 1, 0, 1))
 
   const monthlyData = {}

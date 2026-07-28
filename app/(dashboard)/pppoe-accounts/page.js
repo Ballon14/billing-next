@@ -1,103 +1,157 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { apiPost, apiPut, apiDelete } from '@/lib/client-api.mjs'
-
-const PAGE_SIZE = 25
+import { apiFetch } from '@/lib/client-api.mjs'
 
 export default function PppoeAccountsPage() {
   const [data, setData] = useState([])
-  const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
+  const [search, setSearch] = useState('')
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState({ customer_id: '', username: '', password: '', service: 'pppoe', remote_address: '', profile: 'default', router_id: '', status: 'disabled' })
-  const [customers, setCustomers] = useState([])
-  const [routers, setRouters] = useState([])
+  const [form, setForm] = useState({ name: '', password: '', service: 'pppoe', profile: 'default', 'remote-address': '', comment: '', disabled: 'no' })
+  const [profiles, setProfiles] = useState([])
   const [loading, setLoading] = useState(false)
-  const [syncing, setSyncing] = useState(new Set())
 
-  const load = useCallback(async (p) => {
+  const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/pppoe-accounts?page=${p || page}`)
-      const json = await res.json()
-      if (json.success) { setData(json.data.data); setTotal(json.data.total); setPage(json.data.currentPage) }
-    } finally { setLoading(false) }
-  }, [page])
+      const secrets = await apiFetch('/api/ppp-secrets')
+      setData(secrets || [])
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  useEffect(() => { load(1) }, [])
+  useEffect(() => { load() }, [load])
 
-  const lastPage = Math.ceil(total / PAGE_SIZE)
-
-  async function loadRelated() {
-    const [cRes, rRes] = await Promise.all([fetch('/api/customers?all=true'), fetch('/api/routers?all=true')])
-    const cj = await cRes.json(); const rj = await rRes.json()
-    if (cj.success) setCustomers(cj.data)
-    if (rj.success) setRouters(rj.data)
+  async function loadProfiles() {
+    try {
+      const res = await apiFetch('/api/ppp-profiles')
+      setProfiles(res || [])
+    } catch { setProfiles([]) }
   }
+
+  const filtered = data.filter(s => {
+    if (!search) return true
+    const q = search.toLowerCase()
+    return (s.name || '').toLowerCase().includes(q) ||
+            (s.profile || '').toLowerCase().includes(q) ||
+            (s.remoteAddress || '').toLowerCase().includes(q) ||
+            (s.comment || '').toLowerCase().includes(q)
+  })
 
   async function handleSubmit(e) {
     e.preventDefault()
     try {
-      const payload = { ...form, customer_id: form.customer_id ? Number(form.customer_id) : null, router_id: form.router_id ? Number(form.router_id) : null }
-      if (modal?.id) await apiPut(`/api/pppoe-accounts/${modal.id}`, payload)
-      else await apiPost('/api/pppoe-accounts', payload)
-      setModal(null); load()
+      const payload = { ...form }
+      if (modal?.mikrotikId) {
+        await fetch(`/api/ppp-secrets/${encodeURIComponent(modal.mikrotikId)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).then(r => r.json()).then(j => { if (!j.success) throw new Error(j.error) })
+      } else {
+        await fetch('/api/ppp-secrets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).then(r => r.json()).then(j => { if (!j.success) throw new Error(j.error) })
+      }
+      setModal(null)
+      load()
     } catch (err) { alert(err.message) }
   }
 
-  async function handleSync(id) {
-    setSyncing(s => new Set(s).add(id))
+  async function handleDelete(secret) {
+    if (!confirm(`Hapus PPP secret "${secret.name}"?`)) return
     try {
-      const res = await fetch(`/api/pppoe-accounts/${id}/sync`, { method: 'POST' })
-      const json = await res.json()
-      if (!json.success) alert(json.error || 'Sync failed')
+      const id = secret['.id'] || secret.id
+      await fetch(`/api/ppp-secrets/${encodeURIComponent(id)}`, { method: 'DELETE' })
+        .then(r => r.json()).then(j => { if (!j.success) throw new Error(j.error) })
       load()
     } catch (err) { alert(err.message) }
-    finally { setSyncing(s => { const n = new Set(s); n.delete(id); return n }) }
   }
+
+  const totalOnline = data.filter(s => s.Online).length
 
   return (
     <div className="card">
       <div className="card-header">
-        <h3><i className="fas fa-plug"></i> PPPoE Accounts</h3>
-        <button className="btn-action btn-add" onClick={async () => { await loadRelated(); setForm({ customer_id: '', username: '', password: '', service: 'pppoe', remote_address: '', profile: 'default', router_id: '', status: 'disabled' }); setModal({ id: null, title: 'Tambah Akun PPPoE' }) }}><i className="fas fa-plus"></i> Tambah Akun</button>
+        <h3><i className="fas fa-plug"></i> PPPoE Accounts <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 400 }}>({data.length} total, {totalOnline} online)</span></h3>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            type="text"
+            placeholder="Cari username, profile..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ padding: '6px 12px', fontSize: 12, borderRadius: 6, border: '1px solid rgba(56,189,248,0.15)', background: 'rgba(15,23,42,0.6)', color: 'var(--text-primary)', width: 200 }}
+          />
+          <button className="btn-action btn-add" onClick={async () => {
+            await loadProfiles()
+            setForm({ name: '', password: '', service: 'pppoe', profile: 'default', 'remote-address': '', comment: '', disabled: 'no' })
+            setModal({ mikrotikId: null, title: 'Tambah PPP Secret' })
+          }}><i className="fas fa-plus"></i> Tambah</button>
+        </div>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">
           <table className="data-table">
-            <thead><tr><th>Username</th><th>Customer</th><th>Service</th><th>Profile</th><th>Status</th><th>Router</th><th>Sync</th><th>Actions</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Password</th>
+                <th>Service</th>
+                <th>Profile</th>
+                <th>Remote Address</th>
+                <th>Status</th>
+                <th>Comment</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
             <tbody>
-              {loading ? <tr><td colSpan={8}><div className="empty-state"><div className="empty-state-text">Loading...</div></div></td></tr>
-              : data.length === 0 ? <tr><td colSpan={8}><div className="empty-state"><div className="empty-state-text">Belum ada akun PPPoE</div></div></td></tr>
-              : data.map(a => (
-                <tr key={a.id}>
-                  <td><strong>{a.username}</strong></td>
-                  <td>{a.customer?.name || '-'}</td>
-                  <td>{a.service}</td>
-                  <td>{a.profile}</td>
-                  <td><span className={`status-badge ${a.isActive ? 'success' : 'warning'}`}>{a.isActive ? 'Active' : 'Disabled'}</span></td>
-                  <td>{a.router?.name || '-'}</td>
-                  <td><button className="btn-edit" onClick={() => handleSync(a.id)} disabled={syncing.has(a.id)}>{syncing.has(a.id) ? <i className="fas fa-hourglass-half"></i> : <i className="fas fa-rotate"></i>}</button></td>
+              {loading ? (
+                <tr><td colSpan={8}><div className="empty-state"><div className="empty-state-text">Loading dari MikroTik...</div></div></td></tr>
+              ) : filtered.length === 0 ? (
+                <tr><td colSpan={8}><div className="empty-state"><div className="empty-state-text">{search ? 'Tidak ditemukan' : 'Belum ada PPP Secret'}</div></div></td></tr>
+              ) : filtered.map((s, i) => (
+                <tr key={s['.id'] || s.id || i}>
+                  <td><strong>{s.name}</strong></td>
+                  <td style={{ color: 'var(--text-muted)', fontSize: 11 }}>{s.password || '••••'}</td>
+                  <td>{s.service || 'pppoe'}</td>
+                  <td>{s.profile || '-'}</td>
+                  <td>{s.remoteAddress || '-'}</td>
                   <td>
-                    <button className="btn-edit" onClick={async () => { await loadRelated(); setForm({ customer_id: String(a.customerId), username: a.username, password: '', service: a.service, remote_address: a.remoteAddress || '', profile: a.profile, router_id: a.routerId ? String(a.routerId) : '', status: a.isActive ? 'enabled' : 'disabled' }); setModal({ id: a.id, title: 'Edit Akun PPPoE' }) }}>Edit</button>
-                    <button className="btn-delete" style={{ marginLeft: 4 }} onClick={async () => { if (confirm('Hapus akun PPPoE?')) { await apiDelete(`/api/pppoe-accounts/${a.id}`); load() } }}>Hapus</button>
+                    {s.Online ? (
+                      <span className="status-badge success">Online</span>
+                    ) : s.disabled === 'yes' || s.disabled === true ? (
+                      <span className="status-badge danger">Disabled</span>
+                    ) : (
+                      <span className="status-badge warning">Offline</span>
+                    )}
+                  </td>
+                  <td style={{ color: 'var(--text-muted)', fontSize: 11 }}>{s.comment || '-'}</td>
+                  <td>
+                    <button className="btn-edit" onClick={async () => {
+                      await loadProfiles()
+                      setForm({
+                        name: s.name || '',
+                        password: '',
+                        service: s.service || 'pppoe',
+                        profile: s.profile || 'default',
+                        'remote-address': s.remoteAddress || s['remote-address'] || '',
+                        comment: s.comment || '',
+                        disabled: (s.disabled === 'yes' || s.disabled === true) ? 'yes' : 'no',
+                      })
+                      setModal({ mikrotikId: s['.id'] || s.id, title: 'Edit PPP Secret' })
+                    }}>Edit</button>
+                    <button className="btn-delete" style={{ marginLeft: 4 }} onClick={() => handleDelete(s)}>Hapus</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        {lastPage > 1 && (
-          <div className="pagination-bar">
-            <span>{(page-1)*PAGE_SIZE+1}-{Math.min(page*PAGE_SIZE, total)} dari {total}</span>
-            <div className="pagination-actions">
-              <button className="page-btn" disabled={page <= 1} onClick={() => load(page - 1)}>Prev</button>
-              <span style={{ padding: '5px 8px', color: 'var(--text-muted)', fontSize: 12 }}>{page} / {lastPage}</span>
-              <button className="page-btn" disabled={page >= lastPage} onClick={() => load(page + 1)}>Next</button>
-            </div>
-          </div>
-        )}
       </div>
 
       {modal && (
@@ -106,19 +160,31 @@ export default function PppoeAccountsPage() {
             <div className="crud-modal-header"><h3>{modal.title}</h3><button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button></div>
             <form className="crud-form" onSubmit={handleSubmit}>
               <div className="form-row">
-                <div className="form-group"><label>Username</label><input type="text" value={form.username} onChange={e => setForm({...form, username: e.target.value})} required /></div>
-                <div className="form-group"><label>Password</label><input type="text" value={form.password} onChange={e => setForm({...form, password: e.target.value})} placeholder={modal.id ? '(kosongkan jika tidak diubah)' : ''} required={!modal.id} /></div>
+                <div className="form-group"><label>Name (Username)</label><input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required /></div>
+                <div className="form-group"><label>Password</label><input type="text" value={form.password} onChange={e => setForm({...form, password: e.target.value})} placeholder={modal.mikrotikId ? '(kosongkan jika tidak diubah)' : ''} required={!modal.mikrotikId} /></div>
               </div>
               <div className="form-row">
-                <div className="form-group"><label>Customer</label><select value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value})} required><option value="">— Pilih —</option>{customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
-                <div className="form-group"><label>Router</label><select value={form.router_id} onChange={e => setForm({...form, router_id: e.target.value})}><option value="">— Pilih —</option>{routers.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}</select></div>
+                <div className="form-group"><label>Service</label>
+                  <select value={form.service} onChange={e => setForm({...form, service: e.target.value})}>
+                    <option value="pppoe">PPPoE</option><option value="pptp">PPTP</option><option value="l2tp">L2TP</option><option value="ovpn">OpenVPN</option><option value="any">Any</option>
+                  </select>
+                </div>
+                <div className="form-group"><label>Profile</label>
+                  <select value={form.profile} onChange={e => setForm({...form, profile: e.target.value})}>
+                    <option value="default">default</option>
+                    {profiles.filter(p => p.name !== 'default').map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
+                  </select>
+                </div>
               </div>
               <div className="form-row">
-                <div className="form-group"><label>Service</label><select value={form.service} onChange={e => setForm({...form, service: e.target.value})}><option value="pppoe">PPPoE</option><option value="pptp">PPTP</option><option value="l2tp">L2TP</option><option value="ovpn">OpenVPN</option></select></div>
-                <div className="form-group"><label>Profile</label><input type="text" value={form.profile} onChange={e => setForm({...form, profile: e.target.value})} /></div>
+                <div className="form-group"><label>Remote Address</label><input type="text" value={form['remote-address']} onChange={e => setForm({...form, 'remote-address': e.target.value})} placeholder="Kosongkan untuk auto" /></div>
+                <div className="form-group"><label>Status</label>
+                  <select value={form.disabled} onChange={e => setForm({...form, disabled: e.target.value})}>
+                    <option value="no">Enabled</option><option value="yes">Disabled</option>
+                  </select>
+                </div>
               </div>
-              <div className="form-group"><label>Remote Address</label><input type="text" value={form.remote_address} onChange={e => setForm({...form, remote_address: e.target.value})} /></div>
-              <div className="form-group"><label>Status</label><select value={form.status} onChange={e => setForm({...form, status: e.target.value})}><option value="enabled">Enabled</option><option value="disabled">Disabled</option></select></div>
+              <div className="form-group"><label>Comment</label><input type="text" value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} /></div>
               <div className="form-actions"><button type="button" className="btn-cancel" onClick={() => setModal(null)}>Cancel</button><button type="submit" className="btn-submit">Simpan</button></div>
             </form>
           </div>

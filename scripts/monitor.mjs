@@ -7,9 +7,9 @@ import { RouterosAPI } from '../lib/routeros.mjs'
 const CACHE_FILE = path.join(process.cwd(), 'data', 'cache.json')
 const CACHE_TTL_S = 180
 
-const host = process.env.MIKROTIK_HOST || '10.10.10.1'
-const user = process.env.MIKROTIK_USER || 'admin'
-const password = process.env.MIKROTIK_PASSWORD || 'admin123'
+const host = process.env.MIKROTIK_HOST
+const user = process.env.MIKROTIK_USER
+const password = process.env.MIKROTIK_PASSWORD
 
 function log(msg) {
   const ts = new Date().toISOString().replace('T', ' ').slice(0, 19)

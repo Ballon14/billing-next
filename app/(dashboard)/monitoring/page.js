@@ -10,22 +10,28 @@ export default function OverviewPage() {
   const bridgeCanvas = useRef(null)
 
   useEffect(() => {
+    let active = true
+
     async function load() {
       try {
-        const [resource, identity, interfaces, uplinkTraffic, bridgeTraffic] = await Promise.all([
+        const [routerData, identity, interfaces, uplinkTraffic, bridgeTraffic] = await Promise.all([
           apiFetch('/api/router').catch(() => null),
           apiFetch('/api/identity').catch(() => null),
           apiFetch('/api/interfaces').catch(() => []),
-          apiFetch('/api/traffic/ether1').catch(() => []),
-          apiFetch('/api/traffic/bridge').catch(() => []),
+          apiFetch('/api/traffic/ether1-WAN').catch(() => []),
+          apiFetch('/api/traffic/bridge-internet').catch(() => []),
         ])
-        setData({ resource, identity, interfaces })
+        if (!active) return
+        setData({ resource: routerData, identity, interfaces })
         setCharts({ uplink: uplinkTraffic, bridge: bridgeTraffic })
       } catch (e) {
         console.error(e)
       }
     }
+
     load()
+    const interval = setInterval(load, 3000)
+    return () => { active = false; clearInterval(interval) }
   }, [])
 
   useEffect(() => {
@@ -107,57 +113,49 @@ export default function OverviewPage() {
       </div>
 
       <div className="charts-grid">
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3><i className="fas fa-globe"></i> Uplink</h3>
-            <span className="chart-status">{charts.uplink.length} samples</span>
-          </div>
-          <div className="chart-body">
-            <div className="chart-canvas-wrap">
-              {charts.uplink.length < 2 ? (
-                <div className="chart-waiting">
-                  <span>Menunggu data traffic...</span>
-                </div>
-              ) : <canvas ref={uplinkCanvas} style={{ width: '100%', height: '100%' }}></canvas>}
-            </div>
-          </div>
-          <div className="chart-legend">
-            <div className="chart-legend-item">
-              <span className="chart-legend-dot rx"></span>
-              <span>RX: <span className="chart-legend-value" id="rxUplink">-</span></span>
-            </div>
-            <div className="chart-legend-item">
-              <span className="chart-legend-dot tx"></span>
-              <span>TX: <span className="chart-legend-value" id="txUplink">-</span></span>
-            </div>
-          </div>
-        </div>
+        {[
+          { label: 'Uplink (WAN)', icon: 'fa-globe', data: charts.uplink, canvasRef: uplinkCanvas, id: 'uplink' },
+          { label: 'Bridge (LAN)', icon: 'fa-network-wired', data: charts.bridge, canvasRef: bridgeCanvas, id: 'bridge' },
+        ].map(chart => {
+          const last = chart.data.length > 0 ? chart.data[chart.data.length - 1] : null
+          const rxBps = last ? (last.rxRate || 0) * 8 : 0
+          const txBps = last ? (last.txRate || 0) * 8 : 0
+          const peakRx = chart.data.reduce((m, d) => Math.max(m, (d.rxRate || 0) * 8), 0)
+          const peakTx = chart.data.reduce((m, d) => Math.max(m, (d.txRate || 0) * 8), 0)
 
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3><i className="fas fa-link"></i> Bridge</h3>
-            <span className="chart-status">{charts.bridge.length} samples</span>
-          </div>
-          <div className="chart-body">
-            <div className="chart-canvas-wrap">
-              {charts.bridge.length < 2 ? (
-                <div className="chart-waiting">
-                  <span>Menunggu data traffic...</span>
+          return (
+            <div key={chart.id} className="chart-card">
+              <div className="chart-header">
+                <h3><i className={`fas ${chart.icon}`}></i> {chart.label}</h3>
+              </div>
+              <div className="chart-body">
+                <div className="chart-canvas-wrap">
+                  {chart.data.length < 2 ? (
+                    <div className="chart-waiting">
+                      <span>Menunggu data traffic...</span>
+                    </div>
+                  ) : <canvas ref={chart.canvasRef} style={{ width: '100%', height: '100%' }}></canvas>}
                 </div>
-              ) : <canvas ref={bridgeCanvas} style={{ width: '100%', height: '100%' }}></canvas>}
+              </div>
+              <div className="chart-legend">
+                <div className="chart-legend-item">
+                  <span className="chart-legend-dot rx"></span>
+                  <span>
+                    RX: <span className="chart-legend-value" style={{ color: '#22d3ee' }}>{formatSpeed(rxBps)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: 10, marginLeft: 6 }}>peak {formatSpeed(peakRx)}</span>
+                  </span>
+                </div>
+                <div className="chart-legend-item">
+                  <span className="chart-legend-dot tx"></span>
+                  <span>
+                    TX: <span className="chart-legend-value" style={{ color: '#a78bfa' }}>{formatSpeed(txBps)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: 10, marginLeft: 6 }}>peak {formatSpeed(peakTx)}</span>
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="chart-legend">
-            <div className="chart-legend-item">
-              <span className="chart-legend-dot rx"></span>
-              <span>RX: <span className="chart-legend-value" id="rxBridge">-</span></span>
-            </div>
-            <div className="chart-legend-item">
-              <span className="chart-legend-dot tx"></span>
-              <span>TX: <span className="chart-legend-value" id="txBridge">-</span></span>
-            </div>
-          </div>
-        </div>
+          )
+        })}
       </div>
     </>
   )
@@ -175,65 +173,129 @@ function drawChart(canvas, data) {
   const ctx = canvas.getContext('2d')
   ctx.scale(dpr, dpr)
   const W = rect.width, H = rect.height
-  const P = { top: 10, right: 10, bottom: 24, left: 55 }
+  const P = { top: 12, right: 12, bottom: 28, left: 60 }
   const cw = W - P.left - P.right, ch = H - P.top - P.bottom
   ctx.clearRect(0, 0, W, H)
 
   data = data.slice().sort((a, b) => (a.ts || 0) - (b.ts || 0))
 
-  let maxVal = 0
-  data.forEach(d => { maxVal = Math.max(maxVal, d.rxRate || 0, d.txRate || 0) })
-  maxVal = Math.max(maxVal, 1024) * 1.15
+  // Find max value in bits per second
+  let maxBps = 0
+  data.forEach(d => {
+    maxBps = Math.max(maxBps, (d.rxRate || 0) * 8, (d.txRate || 0) * 8)
+  })
+  maxBps = Math.max(maxBps, 1000) // minimum 1 Kbps scale
 
-  ctx.strokeStyle = 'rgba(56, 189, 248, 0.07)'
-  ctx.lineWidth = 1
+  // Calculate nice round scale
+  const niceMax = getNiceMax(maxBps)
+  const gridLines = 5
+
+  // Draw grid lines and Y-axis labels
   ctx.font = "10px 'JetBrains Mono', monospace"
-  ctx.fillStyle = 'rgba(100, 116, 139, 0.7)'
   ctx.textAlign = 'right'
-  for (let i = 0; i <= 4; i++) {
-    const y = P.top + (ch / 4) * i
-    const val = maxVal - (maxVal / 4) * i
-    ctx.beginPath(); ctx.moveTo(P.left, y); ctx.lineTo(W - P.right, y); ctx.stroke()
-    ctx.fillText(formatSpeed(val * 8), P.left - 5, y + 3)
+  for (let i = 0; i <= gridLines; i++) {
+    const y = P.top + (ch / gridLines) * i
+    const val = niceMax - (niceMax / gridLines) * i
+
+    // Dashed grid lines
+    ctx.setLineDash([4, 4])
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.08)'
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(P.left, y)
+    ctx.lineTo(W - P.right, y)
+    ctx.stroke()
+    ctx.setLineDash([])
+
+    // Y-axis label
+    ctx.fillStyle = 'rgba(148, 163, 184, 0.8)'
+    ctx.fillText(formatSpeed(val), P.left - 8, y + 4)
   }
 
-  function drawLine(points, key, color, fill) {
+  // Draw area + line for each series
+  const rxColor = '#22d3ee'
+  const txColor = '#a78bfa'
+
+  function drawSeries(points, key, lineColor, fillTop, fillBottom) {
     if (points.length < 2) return
-    const step = cw / (Math.max(points.length - 1, 1))
+    const step = cw / (points.length - 1)
+
+    // Create gradient fill
+    const gradient = ctx.createLinearGradient(0, P.top, 0, P.top + ch)
+    gradient.addColorStop(0, fillTop)
+    gradient.addColorStop(1, fillBottom)
+
+    // Draw filled area
     ctx.beginPath()
     points.forEach((p, i) => {
-      const x = P.left + i * step, val = p[key] || 0, y = P.top + ch - (val / maxVal) * ch
+      const x = P.left + i * step
+      const val = (p[key] || 0) * 8
+      const y = P.top + ch - (val / niceMax) * ch
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
     })
-    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke()
-    const lastX = P.left + (points.length - 1) * step
-    ctx.lineTo(lastX, P.top + ch); ctx.lineTo(P.left, P.top + ch); ctx.closePath()
-    ctx.fillStyle = fill; ctx.fill()
+    ctx.lineTo(P.left + (points.length - 1) * step, P.top + ch)
+    ctx.lineTo(P.left, P.top + ch)
+    ctx.closePath()
+    ctx.fillStyle = gradient
+    ctx.fill()
+
+    // Draw line
+    ctx.beginPath()
+    points.forEach((p, i) => {
+      const x = P.left + i * step
+      const val = (p[key] || 0) * 8
+      const y = P.top + ch - (val / niceMax) * ch
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+    })
+    ctx.strokeStyle = lineColor
+    ctx.lineWidth = 2
+    ctx.lineJoin = 'round'
+    ctx.lineCap = 'round'
+    ctx.stroke()
   }
 
-  drawLine(data, 'rxRate', '#22d3ee', 'rgba(34, 211, 238, 0.08)')
-  drawLine(data, 'txRate', '#34d399', 'rgba(52, 211, 153, 0.08)')
+  // Draw TX first (behind), then RX on top
+  drawSeries(data, 'txRate', txColor, 'rgba(167, 139, 250, 0.15)', 'rgba(167, 139, 250, 0.01)')
+  drawSeries(data, 'rxRate', rxColor, 'rgba(34, 211, 238, 0.2)', 'rgba(34, 211, 238, 0.01)')
 
-  ctx.fillStyle = 'rgba(100, 116, 139, 0.5)'
+  // X-axis time labels
+  ctx.fillStyle = 'rgba(148, 163, 184, 0.6)'
   ctx.textAlign = 'center'
   ctx.font = "9px 'JetBrains Mono', monospace"
   if (data.length >= 2) {
-    const oldest = new Date(data[0].ts)
-    const newest = new Date(data[data.length - 1].ts)
-    ctx.fillText(oldest.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), P.left, H - 4)
-    ctx.fillText(newest.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), W - P.right, H - 4)
+    const labelCount = Math.min(5, data.length)
+    for (let i = 0; i < labelCount; i++) {
+      const idx = Math.round(i * (data.length - 1) / (labelCount - 1))
+      const x = P.left + (idx / (data.length - 1)) * cw
+      const t = new Date(data[idx].ts)
+      ctx.fillText(t.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), x, H - 6)
+    }
   }
+}
 
-  const last = data[data.length - 1]
-  const rxEl = document.getElementById('rx' + (canvas.id?.includes('bridge') ? 'Bridge' : 'Uplink'))
-  const txEl = document.getElementById('tx' + (canvas.id?.includes('bridge') ? 'Bridge' : 'Uplink'))
+// Calculate a nice round maximum for the chart scale
+function getNiceMax(maxVal) {
+  if (maxVal <= 0) return 1000
+  // Predefined nice steps in bps
+  const steps = [
+    1000, 2000, 5000, 10000,                               // Kbps range
+    20000, 50000, 100000, 200000, 500000,                   // hundreds Kbps
+    1000000, 2000000, 5000000, 10000000,                    // Mbps range
+    20000000, 50000000, 100000000, 200000000, 500000000,    // hundreds Mbps
+    1000000000, 2000000000, 5000000000, 10000000000,        // Gbps range
+  ]
+  for (const step of steps) {
+    if (step >= maxVal * 1.1) return step
+  }
+  return maxVal * 1.2
 }
 
 function formatSpeed(bps) {
-  if (!bps || bps === 0) return '0 bps'
+  if (!bps || bps <= 0) return '0 bps'
   const n = Number(bps)
-  if (n >= 1073741824) return (n / 1073741824).toFixed(2) + ' Gibps'
-  if (n >= 1048576) return (n / 1048576).toFixed(2) + ' Mibps'
-  if (n >= 1024) return (n / 1024).toFixed(2) + ' Kibps'
-  return n + ' bps'
+  if (n >= 1000000000) return (n / 1000000000).toFixed(2) + ' Gbps'
+  if (n >= 1000000) return (n / 1000000).toFixed(n >= 10000000 ? 1 : 2) + ' Mbps'
+  if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1) + ' Kbps'
+  return Math.round(n) + ' bps'
 }
+
