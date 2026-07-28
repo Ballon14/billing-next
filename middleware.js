@@ -34,7 +34,12 @@ export async function middleware(req) {
   }
 
   if (token && pathname.startsWith("/login")) {
-    return NextResponse.redirect(new URL("/", req.url))
+    const redirectTo = token.role === 'CUSTOMER' ? '/portal' : '/'
+    return NextResponse.redirect(new URL(redirectTo, req.url))
+  }
+
+  if (token && token.role === 'CUSTOMER' && !pathname.startsWith('/portal') && !pathname.startsWith('/api')) {
+    return NextResponse.redirect(new URL('/portal', req.url))
   }
 
   const basePath = '/' + pathname.split('/').filter(Boolean)[0]
@@ -47,5 +52,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/((?!api/|login|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api/|_next/static|_next/image|favicon.ico).*)"],
 }
