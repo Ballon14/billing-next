@@ -1,5 +1,6 @@
 import { success, error, withAuth, withRole, getBody } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
+import { encrypt } from "@/lib/encryption.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
@@ -52,7 +53,7 @@ export const POST = withRole('SUPER_ADMIN', 'ADMIN', 'TECHNICIAN')(async (req) =
       host,
       port: port ? parseInt(port) : 8728,
       username,
-      password: password || '',
+      password: encrypt(password || ''),
       apiPort: api_port ? parseInt(api_port) : null,
       isActive: is_active !== undefined ? Boolean(is_active) : true,
     },

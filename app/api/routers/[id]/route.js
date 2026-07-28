@@ -1,5 +1,6 @@
 import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
+import { encrypt } from "@/lib/encryption.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
@@ -20,7 +21,7 @@ export const PUT = withAuth(async (req, { params }) => {
   }
 
   if (body.password) {
-    data.password = body.password
+    data.password = encrypt(body.password)
   }
 
   const updated = await prisma.router.update({ where: { id }, data })
