@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { apiPost, apiDelete } from '@/lib/client-api.mjs'
+import { apiPost, apiPut } from '@/lib/client-api.mjs'
 
 const PAGE_SIZE = 25
 
@@ -13,6 +13,32 @@ export default function PaymentsPage() {
   const [form, setForm] = useState({ invoice_id: '', amount: '', payment_method: '', reference: '', notes: '' })
   const [invoices, setInvoices] = useState([])
   const [loading, setLoading] = useState(false)
+  const [filterStatus, setFilterStatus] = useState('')
+
+  async function verifyPayment(id) {
+    if (!confirm('Verifikasi pembayaran ini?')) return
+    try {
+      const res = await fetch(`/api/payments/${id}/verify`, { method: 'POST' })
+      const json = await res.json()
+      if (!json.success) throw new Error(json.error)
+      load()
+    } catch (err) { alert(err.message) }
+  }
+
+  async function rejectPayment(id) {
+    const reason = prompt('Alasan penolakan:')
+    if (reason === null) return
+    try {
+      const res = await fetch(`/api/payments/${id}/verify`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: reason || 'Rejected by admin' }),
+      })
+      const json = await res.json()
+      if (!json.success) throw new Error(json.error)
+      load()
+    } catch (err) { alert(err.message) }
+  }
 
   const load = useCallback(async (p) => {
     setLoading(true)
@@ -46,23 +72,33 @@ export default function PaymentsPage() {
     <div className="card">
       <div className="card-header">
         <h3>👛 Payments</h3>
-        <button className="btn-action btn-add" onClick={async () => { await loadInvoices(); setForm({ invoice_id: '', amount: '', payment_method: '', reference: '', notes: '' }); setShowModal(true) }}>➕ Catat Pembayaran</button>
+        <div className="card-header-actions">
+          <select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ padding: '6px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-primary)', fontSize: 13 }}>
+            <option value="">Semua Status</option>
+            <option value="pending">Pending</option>
+            <option value="verified">Verified</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <button className="btn-action btn-add" onClick={async () => { await loadInvoices(); setForm({ invoice_id: '', amount: '', payment_method: '', reference: '', notes: '' }); setShowModal(true) }}>➕ Catat Pembayaran</button>
+        </div>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">
           <table className="data-table">
-            <thead><tr><th>ID</th><th>Invoice</th><th>Customer</th><th>Amount</th><th>Method</th><th>Date</th></tr></thead>
+            <thead><tr><th>ID</th><th>Invoice</th><th>Customer</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
             <tbody>
-              {loading ? <tr><td colSpan={6}><div className="empty-state"><div className="empty-state-text">Loading...</div></div></td></tr>
-              : data.length === 0 ? <tr><td colSpan={6}><div className="empty-state"><div className="empty-state-text">Belum ada pembayaran</div></div></td></tr>
-              : data.map(p => (
+              {loading ? <tr><td colSpan={8}><div className="empty-state"><div className="empty-state-text">Loading...</div></div></td></tr>
+              : data.length === 0 ? <tr><td colSpan={8}><div className="empty-state"><div className="empty-state-text">Belum ada pembayaran</div></div></td></tr>
+              : data.filter(p => !filterStatus || p.status === filterStatus).map(p => (
                 <tr key={p.id}>
                   <td>{p.id}</td>
                   <td>{p.invoice?.invoiceNumber || '-'}</td>
                   <td>{p.invoice?.customer?.name || '-'}</td>
                   <td>Rp {Number(p.amount).toLocaleString('id-ID')}</td>
                   <td>{p.paymentMethod || '-'}</td>
+                  <td><span className={`badge badge-${p.status === 'verified' ? 'success' : p.status === 'rejected' ? 'error' : 'warning'}`}>{p.status}</span></td>
                   <td>{p.paidAt ? new Date(p.paidAt).toLocaleDateString('id-ID') : '-'}</td>
+                  <td>{p.status === 'pending' ? <div className="table-actions"><button className="btn-sm btn-success" onClick={() => verifyPayment(p.id)}>✔</button><button className="btn-sm btn-danger" onClick={() => rejectPayment(p.id)}>✕</button></div> : '-'}</td>
                 </tr>
               ))}
             </tbody>

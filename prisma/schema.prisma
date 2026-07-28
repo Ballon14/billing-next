@@ -126,6 +126,9 @@ model Payment {
   paymentMethod String?
   reference     String?
   notes         String?
+  status        String   @default("pending")
+  verifiedAt    DateTime?
+  verifiedById  Int?
   paidAt        DateTime @default(now())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
