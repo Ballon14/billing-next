@@ -10,6 +10,7 @@ async function seed() {
         name: 'Admin',
         email,
         password: await bcrypt.hash('admin', 10),
+        role: 'SUPER_ADMIN',
       },
     })
     console.log('Admin user created:', email)

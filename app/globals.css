@@ -498,6 +498,11 @@ body::before {
 /* Section actions */
 .tab-actions { margin-bottom: 12px; }
 
+/* Sidebar user info */
+.sidebar-user-info { padding: 8px 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; display: flex; flex-direction: column; gap: 2px; }
+.sidebar-user-info .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.sidebar-user-info .user-role { font-size: 11px; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.5px; }
+
 /* Mobile toggle */
 .mobile-toggle {
   display: none;

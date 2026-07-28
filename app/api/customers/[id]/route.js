@@ -1,11 +1,13 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withRole, getBody } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import { PppoeSyncService } from "@/lib/pppoe-sync.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
 
-export const PUT = withAuth(async (req, { params }) => {
+const adminOnly = withRole('SUPER_ADMIN', 'ADMIN')
+
+export const PUT = adminOnly(async (req, { params }) => {
   const id = parseInt(params.id)
   const body = await getBody(req)
   const customer = await prisma.customer.findUnique({
@@ -74,7 +76,7 @@ export const PUT = withAuth(async (req, { params }) => {
   return success({ message: 'Customer updated' })
 })
 
-export const DELETE = withAuth(async (req, { params }) => {
+export const DELETE = adminOnly(async (req, { params }) => {
   const id = parseInt(params.id)
   const customer = await prisma.customer.findUnique({
     where: { id },

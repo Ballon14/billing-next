@@ -1,4 +1,4 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth, withRole, getBody } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import { PppoeSyncService } from "@/lib/pppoe-sync.mjs"
 import prisma from "@/lib/prisma.mjs"
@@ -39,7 +39,7 @@ export const GET = withAuth(async (req) => {
   })
 })
 
-export const POST = withAuth(async (req) => {
+export const POST = withRole('SUPER_ADMIN', 'ADMIN')(async (req) => {
   const body = await getBody(req)
   const { name, nik, phone, email, address, pppoe_username, pppoe_password, package_id, status } = body
 

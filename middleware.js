@@ -1,6 +1,27 @@
 import { getToken } from "next-auth/jwt"
 import { NextResponse } from "next/server"
 
+const roleAccess = {
+  '/': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/monitoring': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/interfaces': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/dhcp': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/routes': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/firewall': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/arp': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/logs': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/hotspot': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/ip-addresses': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/ip-isolation': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/packages': ['SUPER_ADMIN', 'ADMIN'],
+  '/customers': ['SUPER_ADMIN', 'ADMIN'],
+  '/invoices': ['SUPER_ADMIN', 'ADMIN'],
+  '/payments': ['SUPER_ADMIN', 'ADMIN'],
+  '/routers': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/pppoe-accounts': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/audit-logs': ['SUPER_ADMIN'],
+}
+
 export async function middleware(req) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   const { pathname } = req.nextUrl
@@ -8,6 +29,16 @@ export async function middleware(req) {
   if (!token && !pathname.startsWith("/login") && !pathname.startsWith("/api/auth")) {
     const loginUrl = new URL("/login", req.url)
     return NextResponse.redirect(loginUrl)
+  }
+
+  if (token && pathname.startsWith("/login")) {
+    return NextResponse.redirect(new URL("/", req.url))
+  }
+
+  const basePath = '/' + pathname.split('/').filter(Boolean)[0]
+  const allowedRoles = roleAccess[basePath]
+  if (allowedRoles && token && !allowedRoles.includes(token.role)) {
+    return NextResponse.redirect(new URL("/", req.url))
   }
 
   return NextResponse.next()

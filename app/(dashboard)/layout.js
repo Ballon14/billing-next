@@ -28,6 +28,7 @@ export default function DashboardLayout({ children }) {
   const [activeCounts, setActiveCounts] = useState({})
   const [monthlyRevenue, setMonthlyRevenue] = useState('-')
   const [daemonHealthy, setDaemonHealthy] = useState(true)
+  const userRole = session?.user?.role || ''
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -73,33 +74,37 @@ export default function DashboardLayout({ children }) {
 
   if (status === 'loading') return null
 
+  const isAdmin = userRole === 'SUPER_ADMIN' || userRole === 'ADMIN'
+  const isSuperAdmin = userRole === 'SUPER_ADMIN'
+  const isTech = userRole === 'SUPER_ADMIN' || userRole === 'ADMIN' || userRole === 'TECHNICIAN'
+
   const navItems = [
     { section: 'Billing System', items: [
-      { href: '/', label: 'Billing Dashboard', icon: '📊' },
-      { href: '/packages', label: 'Packages', icon: '💳' },
-      { href: '/customers', label: 'Customers', icon: '👥' },
-      { href: '/invoices', label: 'Invoices', icon: '🧾' },
-      { href: '/payments', label: 'Payments', icon: '👛' },
-      { href: '/pppoe-accounts', label: 'PPPoE Accounts', icon: '🔌' },
-      { href: '/routers', label: 'Routers', icon: '🖥️' },
-      { href: '/audit-logs', label: 'Audit Logs', icon: '📋' },
-    ]},
-    { section: 'Monitoring', items: [
+      ...(isAdmin ? [{ href: '/', label: 'Billing Dashboard', icon: '📊' }] : []),
+      ...(isAdmin ? [{ href: '/packages', label: 'Packages', icon: '💳' }] : []),
+      ...(isAdmin ? [{ href: '/customers', label: 'Customers', icon: '👥' }] : []),
+      ...(isAdmin ? [{ href: '/invoices', label: 'Invoices', icon: '🧾' }] : []),
+      ...(isAdmin ? [{ href: '/payments', label: 'Payments', icon: '👛' }] : []),
+      ...(isTech ? [{ href: '/pppoe-accounts', label: 'PPPoE Accounts', icon: '🔌' }] : []),
+      ...(isTech ? [{ href: '/routers', label: 'Routers', icon: '🖥️' }] : []),
+      ...(isSuperAdmin ? [{ href: '/audit-logs', label: 'Audit Logs', icon: '📋' }] : []),
+    ].filter(Boolean)},
+    { section: 'Monitoring', items: isTech ? [
       { href: '/monitoring', label: 'System Overview', icon: '📈' },
       { href: '/interfaces', label: 'Interfaces', icon: '🔗' },
       { href: '/dhcp', label: 'DHCP Leases', icon: '📋' },
       { href: '/arp', label: 'ARP Table', icon: '📡' },
-    ]},
-    { section: 'Network', items: [
+    ] : []},
+    { section: 'Network', items: isTech ? [
       { href: '/ip-addresses', label: 'IP Addresses', icon: '🌐' },
       { href: '/routes', label: 'Routing Table', icon: '🗺️' },
       { href: '/firewall', label: 'Firewall Rules', icon: '🛡️' },
       { href: '/ip-isolation', label: 'IP Isolation', icon: '🔒' },
-    ]},
-    { section: 'Services', items: [
+    ] : []},
+    { section: 'Services', items: isTech ? [
       { href: '/hotspot', label: 'Hotspot Active', icon: '📶' },
       { href: '/logs', label: 'System Logs', icon: '📄' },
-    ]},
+    ] : []},
   ]
 
   return (
@@ -162,6 +167,10 @@ export default function DashboardLayout({ children }) {
         </nav>
 
         <div className="sidebar-footer">
+          <div className="sidebar-user-info">
+            <span className="user-name">{session?.user?.name || 'User'}</span>
+            <span className="user-role">{userRole}</span>
+          </div>
           <div className="sidebar-footer-row">
             <div className="refresh-indicator">
               <div className="refresh-spinner" id="refreshSpinner"></div>

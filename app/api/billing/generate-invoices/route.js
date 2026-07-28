@@ -1,10 +1,10 @@
-import { success, withAuth } from "@/lib/api-utils.mjs"
+import { success, withRole } from "@/lib/api-utils.mjs"
 import { PppoeSyncService } from "@/lib/pppoe-sync.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
 
-export const POST = withAuth(async () => {
+export const POST = withRole('SUPER_ADMIN')(async () => {
   const customers = await prisma.customer.findMany({
     where: { status: 'active' },
     include: { package: true },

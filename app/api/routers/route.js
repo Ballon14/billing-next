@@ -1,4 +1,4 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth, withRole, getBody } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import prisma from "@/lib/prisma.mjs"
 
@@ -38,7 +38,7 @@ export const GET = withAuth(async (req) => {
   })
 })
 
-export const POST = withAuth(async (req) => {
+export const POST = withRole('SUPER_ADMIN', 'ADMIN', 'TECHNICIAN')(async (req) => {
   const body = await getBody(req)
   const { name, host, port, username, password, api_port, is_active } = body
 
