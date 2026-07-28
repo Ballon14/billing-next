@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { apiPost, apiPut, apiDelete } from '@/lib/client-api.mjs'
 
@@ -14,19 +14,30 @@ export default function CustomersPage() {
   const [form, setForm] = useState({ name: '', nik: '', phone: '', email: '', address: '', pppoe_username: '', pppoe_password: '', package_id: '', status: 'inactive' })
   const [packages, setPackages] = useState([])
   const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [error, setError] = useState(null)
+  const searchTimeout = useRef(null)
 
   const load = useCallback(async (p) => {
     setLoading(true)
+    setError(null)
     try {
-      const res = await fetch(`/api/customers?page=${p || page}`)
+      const params = new URLSearchParams({ page: String(p || page) })
+      if (search) params.set('search', search)
+      if (statusFilter) params.set('status', statusFilter)
+      const res = await fetch(`/api/customers?${params}`)
       const json = await res.json()
-      if (json.success) {
-        setData(json.data.data)
-        setTotal(json.data.total)
-        setPage(json.data.currentPage)
-      }
+      if (!json.success) throw new Error(json.error || 'Gagal memuat data')
+      setData(json.data.data)
+      setTotal(json.data.total)
+      setPage(json.data.currentPage)
+    } catch (err) {
+      setError(err.message)
     } finally { setLoading(false) }
-  }, [page])
+  }, [page, search, statusFilter])
+
+  useEffect(() => { load(1) }, [search, statusFilter])
 
   useEffect(() => { load(1) }, [])
 
@@ -78,7 +89,18 @@ export default function CustomersPage() {
     <div className="card">
       <div className="card-header">
         <h3>👥 Customers</h3>
-        <button className="btn-action btn-add" onClick={openAdd}>➕ Tambah Pelanggan</button>
+        <div className="card-header-actions">
+          <input type="text" className="search-input" placeholder="Cari nama, PPPoE, phone..." value={search} onChange={e => setSearch(e.target.value)} />
+          <select className="filter-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            <option value="">Semua Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="suspended">Suspended</option>
+            <option value="terminated">Terminated</option>
+            <option value="isolated">Isolated</option>
+          </select>
+          <button className="btn-action btn-add" onClick={() => openAdd()}>➕ Tambah Pelanggan</button>
+        </div>
       </div>
       <div className="card-body">
         <div className="data-table-wrapper">
@@ -87,10 +109,12 @@ export default function CustomersPage() {
               <tr><th>Name</th><th>PPPoE</th><th>Paket</th><th>Phone</th><th>Status</th><th>Actions</th></tr>
             </thead>
             <tbody>
-              {loading ? (
-                <tr><td colSpan={6}><div className="empty-state"><div className="empty-state-text">Loading...</div></div></td></tr>
+              {error ? (
+                <tr><td colSpan={7}><div className="empty-state"><div className="empty-state-text" style={{ color: 'var(--danger)' }}>Error: {error}</div></div></td></tr>
+              ) : loading ? (
+                <tr><td colSpan={7}><div className="empty-state"><div className="empty-state-text">Loading...</div></div></td></tr>
               ) : data.length === 0 ? (
-                <tr><td colSpan={6}><div className="empty-state"><div className="empty-state-text">Belum ada pelanggan</div></div></td></tr>
+                <tr><td colSpan={7}><div className="empty-state"><div className="empty-state-text">{search || statusFilter ? 'Tidak ada hasil pencarian' : 'Belum ada pelanggan'}</div></div></td></tr>
               ) : data.map(c => (
                 <tr key={c.id}>
                   <td><Link href={`/customers/${c.id}`} className="customer-link"><strong>{c.name}</strong></Link></td>

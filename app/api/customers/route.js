@@ -9,9 +9,25 @@ export const dynamic = 'force-dynamic'
 export const GET = withAuth(async (req) => {
   const { searchParams } = new URL(req.url)
   const all = searchParams.get('all')
+  const search = searchParams.get('search') || ''
+  const statusFilter = searchParams.get('status') || ''
+
+  const where = {}
+  if (search) {
+    where.OR = [
+      { name: { contains: search } },
+      { pppoeUsername: { contains: search } },
+      { phone: { contains: search } },
+      { email: { contains: search } },
+    ]
+  }
+  if (statusFilter) {
+    where.status = statusFilter
+  }
 
   if (all) {
     const data = await prisma.customer.findMany({
+      where,
       orderBy: { id: 'desc' },
       include: { package: true, pppoeAccounts: { include: { router: true } } },
     })
@@ -24,12 +40,13 @@ export const GET = withAuth(async (req) => {
 
   const [data, total] = await Promise.all([
     prisma.customer.findMany({
+      where,
       orderBy: { id: 'desc' },
       skip,
       take: pageSize,
       include: { package: true, pppoeAccounts: { include: { router: true } } },
     }),
-    prisma.customer.count(),
+    prisma.customer.count({ where }),
   ])
 
   return success({
