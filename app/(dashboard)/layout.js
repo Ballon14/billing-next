@@ -28,7 +28,20 @@ export default function DashboardLayout({ children }) {
   const [activeCounts, setActiveCounts] = useState({})
   const [monthlyRevenue, setMonthlyRevenue] = useState('-')
   const [daemonHealthy, setDaemonHealthy] = useState(true)
+  const [darkMode, setDarkMode] = useState(true)
   const userRole = session?.user?.role || ''
+
+  useEffect(() => {
+    const saved = localStorage.getItem('theme')
+    const isDark = saved !== 'light'
+    setDarkMode(isDark)
+    document.documentElement.classList.toggle('light-theme', !isDark)
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light')
+    document.documentElement.classList.toggle('light-theme', !darkMode)
+  }, [darkMode])
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -172,6 +185,9 @@ export default function DashboardLayout({ children }) {
             <span className="user-role">{userRole}</span>
           </div>
           <div className="sidebar-footer-row">
+            <button className="theme-toggle-btn" onClick={() => setDarkMode(!darkMode)} title={darkMode ? 'Light Mode' : 'Dark Mode'}>
+              {darkMode ? '☀️' : '🌙'}
+            </button>
             <div className="refresh-indicator">
               <div className="refresh-spinner" id="refreshSpinner"></div>
               <span>Auto-refresh</span>
