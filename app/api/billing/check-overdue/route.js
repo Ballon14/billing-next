@@ -2,26 +2,30 @@ import { success, withRole } from "@/lib/api-utils.mjs"
 import { PppoeSyncService } from "@/lib/pppoe-sync.mjs"
 import prisma from "@/lib/prisma.mjs"
 
+const LATE_FEE_PERCENT = 0.02
+const GRACE_PERIOD_DAYS = 3
+
 export const dynamic = 'force-dynamic'
 
 export const POST = withRole('SUPER_ADMIN')(async () => {
   const now = new Date()
+  const cutoffDate = new Date(now.getTime() - GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000)
+    .toISOString().split('T')[0]
+
   const overdueInvoices = await prisma.invoice.findMany({
     where: {
       status: 'unpaid',
-      dueDate: {
-        lt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      },
+      dueDate: { lt: cutoffDate },
     },
     include: { customer: true },
   })
 
-  let isolated = 0
+  let suspended = 0
   for (const invoice of overdueInvoices) {
-    if (invoice.customer && invoice.customer.status !== 'isolated') {
+    if (invoice.customer && invoice.customer.status === 'active') {
       await prisma.customer.update({
         where: { id: invoice.customer.id },
-        data: { status: 'isolated' },
+        data: { status: 'suspended' },
       })
 
       const accounts = await prisma.pppoeAccount.findMany({
@@ -37,9 +41,17 @@ export const POST = withRole('SUPER_ADMIN')(async () => {
         }
       }
 
-      isolated++
+      suspended++
+    }
+
+    const lateFee = Math.round(invoice.amount * LATE_FEE_PERCENT)
+    if (lateFee > 0) {
+      await prisma.invoice.update({
+        where: { id: invoice.id },
+        data: { amount: invoice.amount + lateFee },
+      })
     }
   }
 
-  return success({ message: `${isolated} customer(s) isolated`, count: isolated })
+  return success({ message: `${suspended} customer(s) suspended, fees applied to ${overdueInvoices.length} invoice(s)`, count: suspended })
 })
