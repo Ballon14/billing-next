@@ -516,6 +516,10 @@ body::before {
 /* Filter select */
 .filter-select { padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 13px; }
 
+/* Customer link */
+.customer-link { color: var(--accent-cyan); text-decoration: none; }
+.customer-link:hover { text-decoration: underline; }
+
 /* Sidebar user info */
 .sidebar-user-info { padding: 8px 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; display: flex; flex-direction: column; gap: 2px; }
 .sidebar-user-info .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }

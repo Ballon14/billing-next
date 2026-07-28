@@ -8,6 +8,20 @@ export const dynamic = 'force-dynamic'
 
 const adminOnly = withRole('SUPER_ADMIN', 'ADMIN')
 
+export const GET = withRole('SUPER_ADMIN', 'ADMIN', 'TECHNICIAN')(async (req, { params }) => {
+  const id = parseInt(params.id)
+  const customer = await prisma.customer.findUnique({
+    where: { id },
+    include: {
+      package: true,
+      pppoeAccounts: { include: { router: true } },
+      invoices: { orderBy: { createdAt: 'desc' }, include: { payments: true } },
+    },
+  })
+  if (!customer) return error('Customer not found', 404)
+  return success(customer)
+})
+
 export const PUT = adminOnly(validatePartial(customerSchema)(async (req, { params }) => {
   const id = parseInt(params.id)
   const body = req.validated

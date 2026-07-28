@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 import { apiPost, apiPut, apiDelete } from '@/lib/client-api.mjs'
 
 const PAGE_SIZE = 25
@@ -92,12 +93,13 @@ export default function CustomersPage() {
                 <tr><td colSpan={6}><div className="empty-state"><div className="empty-state-text">Belum ada pelanggan</div></div></td></tr>
               ) : data.map(c => (
                 <tr key={c.id}>
-                  <td><strong>{c.name}</strong></td>
+                  <td><Link href={`/customers/${c.id}`} className="customer-link"><strong>{c.name}</strong></Link></td>
                   <td>{c.pppoeUsername}</td>
                   <td>{c.package?.name || '-'}</td>
                   <td>{c.phone || '-'}</td>
                   <td><span className={`status-badge ${c.status === 'active' ? 'success' : c.status === 'isolated' ? 'danger' : 'warning'}`}>{c.status}</span></td>
                   <td>
+                    <Link href={`/customers/${c.id}`} className="btn-edit" style={{ textDecoration: 'none', display: 'inline-block' }}>Detail</Link>
                     <button className="btn-edit" onClick={() => openEdit(c.id)}>Edit</button>
                     <button className="btn-delete" style={{ marginLeft: 4 }} onClick={() => handleDelete(c.id)}>Hapus</button>
                   </td>
