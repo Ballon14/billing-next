@@ -1,5 +1,6 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
+import { validate, invoiceSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
@@ -38,18 +39,16 @@ export const GET = withAuth(async (req) => {
   })
 })
 
-export const POST = withAuth(async (req) => {
-  const body = await getBody(req)
-  const { customer_id, invoice_number, amount, status, due_date, period_start, period_end } = body
+export const POST = withAuth(validate(invoiceSchema)(async (req) => {
+  const { customer_id, amount, status, due_date, period_start, period_end } = req.validated
 
-  if (!customer_id || !invoice_number || amount === undefined || !due_date) {
-    return error('Customer ID, invoice number, amount, and due date required')
-  }
+  const invoiceCount = await prisma.invoice.count()
+  const invoiceNumber = `INV-${String(invoiceCount + 1).padStart(5, '0')}`
 
   const data = {
-    customerId: parseInt(customer_id),
-    invoiceNumber: invoice_number,
-    amount: parseFloat(amount),
+    customerId: customer_id,
+    invoiceNumber,
+    amount,
     status: status || 'unpaid',
     dueDate: due_date,
     periodStart: period_start || null,
@@ -69,4 +68,4 @@ export const POST = withAuth(async (req) => {
   })
 
   return success(invoice)
-})
+}))

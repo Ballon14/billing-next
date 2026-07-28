@@ -1,12 +1,13 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
+import { validatePartial, invoiceSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
 
-export const PUT = withAuth(async (req, { params }) => {
+export const PUT = withAuth(validatePartial(invoiceSchema)(async (req, { params }) => {
   const id = parseInt(params.id)
-  const body = await getBody(req)
+  const body = req.validated
   const original = await prisma.invoice.findUnique({ where: { id } })
   if (!original) return error('Invoice not found', 404)
 
@@ -20,9 +21,9 @@ export const PUT = withAuth(async (req, { params }) => {
   const updated = await prisma.invoice.update({
     where: { id },
     data: {
-      customerId: parseInt(body.customer_id),
-      invoiceNumber: body.invoice_number,
-      amount: parseFloat(body.amount),
+      customerId: body.customer_id,
+      invoiceNumber: original.invoiceNumber,
+      amount: body.amount,
       status: body.status,
       dueDate: body.due_date,
       periodStart: body.period_start || null,
@@ -42,7 +43,7 @@ export const PUT = withAuth(async (req, { params }) => {
   })
 
   return success({ message: 'Invoice updated' })
-})
+}))
 
 export const DELETE = withAuth(async (req, { params }) => {
   const id = parseInt(params.id)

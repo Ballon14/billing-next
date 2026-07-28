@@ -1,6 +1,7 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import { PppoeSyncService } from "@/lib/pppoe-sync.mjs"
+import { validate, pppoeAccountSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
@@ -39,24 +40,19 @@ export const GET = withAuth(async (req) => {
   })
 })
 
-export const POST = withAuth(async (req) => {
-  const body = await getBody(req)
-  const { customer_id, router_id, username, password, profile, ip_address, service, disabled } = body
-
-  if (!customer_id || !username || !password) {
-    return error('Customer ID, username, and password required')
-  }
+export const POST = withAuth(validate(pppoeAccountSchema)(async (req) => {
+  const { customer_id, router_id, username, password, profile, ip_address, service, disabled } = req.validated
 
   const account = await prisma.pppoeAccount.create({
     data: {
-      customerId: parseInt(customer_id),
-      routerId: router_id ? parseInt(router_id) : null,
+      customerId: customer_id,
+      routerId: router_id,
       username,
       password,
       profile: profile || null,
       ipAddress: ip_address || null,
       service: service || 'pppoe',
-      disabled: disabled === true || disabled === 'true',
+      disabled,
     },
     include: { customer: true, router: true },
   })
@@ -80,4 +76,4 @@ export const POST = withAuth(async (req) => {
   })
 
   return success(account)
-})
+}))

@@ -1,12 +1,13 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
+import { validatePartial, packageSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
 
-export const PUT = withAuth(async (req, { params }) => {
+export const PUT = withAuth(validatePartial(packageSchema)(async (req, { params }) => {
   const id = parseInt(params.id)
-  const body = await getBody(req)
+  const body = req.validated
   const original = await prisma.package.findUnique({ where: { id } })
   if (!original) return error('Package not found', 404)
 
@@ -14,7 +15,7 @@ export const PUT = withAuth(async (req, { params }) => {
     where: { id },
     data: {
       name: body.name,
-      price: parseFloat(body.price),
+      price: body.price,
       speed: body.speed || null,
       description: body.description || null,
       billingPeriod: body.billing_period || original.billingPeriod,
@@ -32,7 +33,7 @@ export const PUT = withAuth(async (req, { params }) => {
   })
 
   return success({ message: 'Package updated' })
-})
+}))
 
 export const DELETE = withAuth(async (req, { params }) => {
   const id = parseInt(params.id)

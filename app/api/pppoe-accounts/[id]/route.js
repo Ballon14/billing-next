@@ -1,22 +1,23 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import { PppoeSyncService } from "@/lib/pppoe-sync.mjs"
+import { validatePartial, pppoeAccountSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
 
-export const PUT = withAuth(async (req, { params }) => {
+export const PUT = withAuth(validatePartial(pppoeAccountSchema)(async (req, { params }) => {
   const id = parseInt(params.id)
-  const body = await getBody(req)
+  const body = req.validated
   const original = await prisma.pppoeAccount.findUnique({ where: { id } })
   if (!original) return error('PPPoE account not found', 404)
 
   const data = {}
-  if (body.router_id !== undefined) data.routerId = body.router_id ? parseInt(body.router_id) : null
+  if (body.router_id !== undefined) data.routerId = body.router_id
   if (body.password !== undefined) data.password = body.password
   if (body.profile !== undefined) data.profile = body.profile || null
   if (body.ip_address !== undefined) data.ipAddress = body.ip_address || null
-  if (body.disabled !== undefined) data.disabled = body.disabled === true || body.disabled === 'true'
+  if (body.disabled !== undefined) data.disabled = body.disabled
 
   const updated = await prisma.pppoeAccount.update({
     where: { id },
@@ -42,7 +43,7 @@ export const PUT = withAuth(async (req, { params }) => {
   })
 
   return success({ message: 'PPPoE account updated' })
-})
+}))
 
 export const DELETE = withAuth(async (req, { params }) => {
   const id = parseInt(params.id)

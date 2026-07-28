@@ -1,6 +1,7 @@
-import { success, error, withAuth, withRole, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth, withRole } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import { encrypt } from "@/lib/encryption.mjs"
+import { validate, routerSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
@@ -39,22 +40,17 @@ export const GET = withAuth(async (req) => {
   })
 })
 
-export const POST = withRole('SUPER_ADMIN', 'ADMIN', 'TECHNICIAN')(async (req) => {
-  const body = await getBody(req)
-  const { name, host, port, username, password, api_port, is_active } = body
-
-  if (!name || !host || !username) {
-    return error('Name, host, and username required')
-  }
+export const POST = withRole('SUPER_ADMIN', 'ADMIN', 'TECHNICIAN')(validate(routerSchema)(async (req) => {
+  const { name, host, port, username, password, api_port, is_active } = req.validated
 
   const router = await prisma.router.create({
     data: {
       name,
       host,
-      port: port ? parseInt(port) : 8728,
+      port: port || 8728,
       username,
       password: encrypt(password || ''),
-      apiPort: api_port ? parseInt(api_port) : null,
+      apiPort: api_port || null,
       isActive: is_active !== undefined ? Boolean(is_active) : true,
     },
   })
@@ -69,4 +65,4 @@ export const POST = withRole('SUPER_ADMIN', 'ADMIN', 'TECHNICIAN')(async (req) =
   })
 
   return success(router)
-})
+}))

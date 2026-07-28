@@ -1,22 +1,23 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import { encrypt } from "@/lib/encryption.mjs"
+import { validatePartial, routerSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
 
-export const PUT = withAuth(async (req, { params }) => {
+export const PUT = withAuth(validatePartial(routerSchema)(async (req, { params }) => {
   const id = parseInt(params.id)
-  const body = await getBody(req)
+  const body = req.validated
   const original = await prisma.router.findUnique({ where: { id } })
   if (!original) return error('Router not found', 404)
 
   const data = {
     name: body.name,
     host: body.host,
-    port: body.port ? parseInt(body.port) : 8728,
+    port: body.port || 8728,
     username: body.username,
-    apiPort: body.api_port ? parseInt(body.api_port) : null,
+    apiPort: body.api_port || null,
     isActive: body.is_active !== undefined ? Boolean(body.is_active) : original.isActive,
   }
 
@@ -37,7 +38,7 @@ export const PUT = withAuth(async (req, { params }) => {
   })
 
   return success({ ...updated, password: undefined })
-})
+}))
 
 export const DELETE = withAuth(async (req, { params }) => {
   const id = parseInt(params.id)

@@ -1,15 +1,16 @@
-import { success, error, withRole, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withRole } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import { PppoeSyncService } from "@/lib/pppoe-sync.mjs"
+import { validatePartial, customerSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
 
 const adminOnly = withRole('SUPER_ADMIN', 'ADMIN')
 
-export const PUT = adminOnly(async (req, { params }) => {
+export const PUT = adminOnly(validatePartial(customerSchema)(async (req, { params }) => {
   const id = parseInt(params.id)
-  const body = await getBody(req)
+  const body = req.validated
   const customer = await prisma.customer.findUnique({
     where: { id },
     include: { pppoeAccounts: true },
@@ -29,7 +30,7 @@ export const PUT = adminOnly(async (req, { params }) => {
       address: body.address || null,
       pppoeUsername: body.pppoe_username,
       pppoePassword: body.pppoe_password,
-      packageId: parseInt(body.package_id),
+      packageId: body.package_id,
       status: body.status || customer.status,
     },
   })
@@ -74,7 +75,7 @@ export const PUT = adminOnly(async (req, { params }) => {
   })
 
   return success({ message: 'Customer updated' })
-})
+}))
 
 export const DELETE = adminOnly(async (req, { params }) => {
   const id = parseInt(params.id)

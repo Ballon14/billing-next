@@ -1,5 +1,6 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth, withRole } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
+import { validate, packageSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
@@ -30,16 +31,13 @@ export const GET = withAuth(async (req) => {
   })
 })
 
-export const POST = withAuth(async (req) => {
-  const body = await getBody(req)
-  const { name, price, speed, description, billing_period } = body
-
-  if (!name || price === undefined) return error('Name and price required')
+export const POST = withRole('SUPER_ADMIN', 'ADMIN')(validate(packageSchema)(async (req) => {
+  const { name, price, speed, description, billing_period } = req.validated
 
   const pkg = await prisma.package.create({
     data: {
       name,
-      price: parseFloat(price),
+      price,
       speed: speed || null,
       description: description || null,
       billingPeriod: billing_period || 'monthly',
@@ -56,4 +54,4 @@ export const POST = withAuth(async (req) => {
   })
 
   return success(pkg)
-})
+}))

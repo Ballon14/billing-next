@@ -1,6 +1,7 @@
-import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import { PppoeSyncService } from "@/lib/pppoe-sync.mjs"
+import { validate, paymentSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
@@ -39,22 +40,17 @@ export const GET = withAuth(async (req) => {
   })
 })
 
-export const POST = withAuth(async (req) => {
-  const body = await getBody(req)
-  const { invoice_id, amount, payment_method, reference, notes, paid_at } = body
-
-  if (!invoice_id || amount === undefined) {
-    return error('Invoice ID and amount required')
-  }
+export const POST = withAuth(validate(paymentSchema)(async (req) => {
+  const { invoice_id, amount, payment_method, reference, notes } = req.validated
 
   const payment = await prisma.payment.create({
     data: {
-      invoiceId: parseInt(invoice_id),
-      amount: parseFloat(amount),
+      invoiceId: invoice_id,
+      amount,
       paymentMethod: payment_method || null,
       reference: reference || null,
       notes: notes || null,
-      paidAt: paid_at ? new Date(paid_at) : new Date(),
+      paidAt: new Date(),
     },
     include: { invoice: { include: { customer: true } } },
   })
@@ -104,4 +100,4 @@ export const POST = withAuth(async (req) => {
   })
 
   return success(payment)
-})
+}))

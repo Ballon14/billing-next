@@ -1,6 +1,7 @@
-import { success, error, withAuth, withRole, getBody } from "@/lib/api-utils.mjs"
+import { success, error, withAuth, withRole } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import { PppoeSyncService } from "@/lib/pppoe-sync.mjs"
+import { validate, customerSchema } from "@/lib/validate.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
@@ -39,13 +40,8 @@ export const GET = withAuth(async (req) => {
   })
 })
 
-export const POST = withRole('SUPER_ADMIN', 'ADMIN')(async (req) => {
-  const body = await getBody(req)
-  const { name, nik, phone, email, address, pppoe_username, pppoe_password, package_id, status } = body
-
-  if (!name || !pppoe_username || !pppoe_password || !package_id) {
-    return error('Name, PPPoE username, password, and package are required')
-  }
+export const POST = withRole('SUPER_ADMIN', 'ADMIN')(validate(customerSchema)(async (req) => {
+  const { name, nik, phone, email, address, pppoe_username, pppoe_password, package_id, status } = req.validated
 
   const customer = await prisma.customer.create({
     data: {
@@ -90,4 +86,4 @@ export const POST = withRole('SUPER_ADMIN', 'ADMIN')(async (req) => {
   })
 
   return success(customer)
-})
+}))
