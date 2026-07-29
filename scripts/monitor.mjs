@@ -144,9 +144,6 @@ async function run() {
           const logs = await fetchData(api, '/log/print')
           if (logs) partial.logs = logs.slice(-50)
 
-          const hotspot = await fetchData(api, '/ip/hotspot/active/print')
-          if (hotspot) partial.hotspotActive = hotspot
-
           if (partial.firewallFilter) {
             partial.isolatedIps = extractIsolatedIps(partial.firewallFilter)
           }

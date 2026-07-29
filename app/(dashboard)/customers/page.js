@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { apiPost, apiPut, apiDelete } from '@/lib/client-api.mjs'
+import CrudModal from '@/components/CrudModal'
+import FormGroup from '@/components/FormGroup'
+import FormRow from '@/components/FormRow'
 
 const PAGE_SIZE = 25
 
@@ -144,73 +147,50 @@ export default function CustomersPage() {
         )}
       </div>
 
-      {modal && (
-        <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setModal(null)}>
-          <div className="crud-modal-content crud-modal-wide">
-            <div className="crud-modal-header">
-              <h3>{modal.title}</h3>
-              <button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button>
-            </div>
-            <form className="crud-form" onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Nama</label>
-                  <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
-                </div>
-                <div className="form-group">
-                  <label>NIK</label>
-                  <input type="text" value={form.nik} onChange={e => setForm({...form, nik: e.target.value})} />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Phone</label>
-                  <input type="text" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
-                </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Address</label>
-                <input type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>PPPoE Username</label>
-                  <input type="text" value={form.pppoe_username} onChange={e => setForm({...form, pppoe_username: e.target.value})} required />
-                </div>
-                <div className="form-group">
-                  <label>PPPoE Password</label>
-                  <input type="text" value={form.pppoe_password} onChange={e => setForm({...form, pppoe_password: e.target.value})} required />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Paket</label>
-                  <select value={form.package_id} onChange={e => setForm({...form, package_id: e.target.value})} required>
-                    <option value="">— Pilih Paket —</option>
-                    {packages.map(p => <option key={p.id} value={p.id}>{p.name} (Rp {Number(p.price).toLocaleString('id-ID')})</option>)}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Status</label>
-                  <select value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="isolated">Isolated</option>
-                  </select>
-                </div>
-              </div>
-              <div className="form-actions">
-                <button type="button" className="btn-cancel" onClick={() => setModal(null)}>Cancel</button>
-                <button type="submit" className="btn-submit">Simpan</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CrudModal open={!!modal} title={modal?.title} wide onClose={() => setModal(null)} onSubmit={handleSubmit}>
+        <FormRow>
+          <FormGroup label="Nama">
+            <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+          </FormGroup>
+          <FormGroup label="NIK">
+            <input type="text" value={form.nik} onChange={e => setForm({...form, nik: e.target.value})} />
+          </FormGroup>
+        </FormRow>
+        <FormRow>
+          <FormGroup label="Phone">
+            <input type="text" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+          </FormGroup>
+          <FormGroup label="Email">
+            <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+          </FormGroup>
+        </FormRow>
+        <FormGroup label="Address">
+          <input type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
+        </FormGroup>
+        <FormRow>
+          <FormGroup label="PPPoE Username">
+            <input type="text" value={form.pppoe_username} onChange={e => setForm({...form, pppoe_username: e.target.value})} required />
+          </FormGroup>
+          <FormGroup label="PPPoE Password">
+            <input type="text" value={form.pppoe_password} onChange={e => setForm({...form, pppoe_password: e.target.value})} required />
+          </FormGroup>
+        </FormRow>
+        <FormRow>
+          <FormGroup label="Paket">
+            <select value={form.package_id} onChange={e => setForm({...form, package_id: e.target.value})} required>
+              <option value="">— Pilih Paket —</option>
+              {packages.map(p => <option key={p.id} value={p.id}>{p.name} (Rp {Number(p.price).toLocaleString('id-ID')})</option>)}
+            </select>
+          </FormGroup>
+          <FormGroup label="Status">
+            <select value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="isolated">Isolated</option>
+            </select>
+          </FormGroup>
+        </FormRow>
+      </CrudModal>
     </div>
   )
 }

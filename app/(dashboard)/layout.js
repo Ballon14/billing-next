@@ -117,7 +117,6 @@ export default function DashboardLayout({ children }) {
       { href: '/ip-isolation', label: 'IP Isolation', icon: 'fa-lock' },
     ] : []},
     { section: 'Services', items: isTech ? [
-      { href: '/hotspot', label: 'Hotspot Active', icon: 'fa-wifi' },
       { href: '/logs', label: 'System Logs', icon: 'fa-file-lines' },
     ] : []},
   ]
@@ -263,7 +262,7 @@ function getPageTitle(path) {
     '/firewall': 'Firewall Rules',
     '/arp': 'ARP Table',
     '/logs': 'System Logs',
-    '/hotspot': 'Hotspot Active',
+
     '/ip-addresses': 'IP Addresses',
     '/ip-isolation': 'IP Isolation',
     '/packages': 'Packages',

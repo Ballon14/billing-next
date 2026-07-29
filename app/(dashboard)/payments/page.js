@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { apiPost, apiPut } from '@/lib/client-api.mjs'
+import CrudModal from '@/components/CrudModal'
+import FormGroup from '@/components/FormGroup'
+import FormRow from '@/components/FormRow'
 
 const PAGE_SIZE = 25
 
@@ -117,23 +120,28 @@ export default function PaymentsPage() {
         )}
       </div>
 
-      {showModal && (
-        <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setShowModal(false)}>
-          <div className="crud-modal-content">
-            <div className="crud-modal-header"><h3>Catat Pembayaran</h3><button className="crud-modal-close" onClick={() => setShowModal(false)}><i className="fas fa-xmark"></i></button></div>
-            <form className="crud-form" onSubmit={handleSubmit}>
-              <div className="form-group"><label>Invoice</label><select value={form.invoice_id} onChange={e => setForm({...form, invoice_id: e.target.value})} required><option value="">— Pilih Invoice —</option>{invoices.map(i => <option key={i.id} value={i.id}>{i.invoiceNumber} - {i.customer?.name} (Rp {Number(i.amount).toLocaleString('id-ID')})</option>)}</select></div>
-              <div className="form-group"><label>Amount</label><input type="number" step="0.01" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} required /></div>
-              <div className="form-row">
-                <div className="form-group"><label>Payment Method</label><input type="text" value={form.payment_method} onChange={e => setForm({...form, payment_method: e.target.value})} /></div>
-                <div className="form-group"><label>Reference</label><input type="text" value={form.reference} onChange={e => setForm({...form, reference: e.target.value})} /></div>
-              </div>
-              <div className="form-group"><label>Notes</label><input type="text" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></div>
-              <div className="form-actions"><button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button><button type="submit" className="btn-submit">Simpan</button></div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CrudModal open={showModal} title="Catat Pembayaran" onClose={() => setShowModal(false)} onSubmit={handleSubmit}>
+        <FormGroup label="Invoice">
+          <select value={form.invoice_id} onChange={e => setForm({...form, invoice_id: e.target.value})} required>
+            <option value="">— Pilih Invoice —</option>
+            {invoices.map(i => <option key={i.id} value={i.id}>{i.invoiceNumber} - {i.customer?.name} (Rp {Number(i.amount).toLocaleString('id-ID')})</option>)}
+          </select>
+        </FormGroup>
+        <FormGroup label="Amount">
+          <input type="number" step="0.01" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} required />
+        </FormGroup>
+        <FormRow>
+          <FormGroup label="Payment Method">
+            <input type="text" value={form.payment_method} onChange={e => setForm({...form, payment_method: e.target.value})} />
+          </FormGroup>
+          <FormGroup label="Reference">
+            <input type="text" value={form.reference} onChange={e => setForm({...form, reference: e.target.value})} />
+          </FormGroup>
+        </FormRow>
+        <FormGroup label="Notes">
+          <input type="text" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+        </FormGroup>
+      </CrudModal>
     </div>
   )
 }

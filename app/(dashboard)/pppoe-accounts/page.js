@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { apiFetch } from '@/lib/client-api.mjs'
+import CrudModal from '@/components/CrudModal'
+import FormGroup from '@/components/FormGroup'
+import FormRow from '@/components/FormRow'
 
 export default function PppoeAccountsPage() {
   const [data, setData] = useState([])
@@ -154,42 +157,42 @@ export default function PppoeAccountsPage() {
         </div>
       </div>
 
-      {modal && (
-        <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setModal(null)}>
-          <div className="crud-modal-content crud-modal-wide">
-            <div className="crud-modal-header"><h3>{modal.title}</h3><button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button></div>
-            <form className="crud-form" onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div className="form-group"><label>Name (Username)</label><input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required /></div>
-                <div className="form-group"><label>Password</label><input type="text" value={form.password} onChange={e => setForm({...form, password: e.target.value})} placeholder={modal.mikrotikId ? '(kosongkan jika tidak diubah)' : ''} required={!modal.mikrotikId} /></div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>Service</label>
-                  <select value={form.service} onChange={e => setForm({...form, service: e.target.value})}>
-                    <option value="pppoe">PPPoE</option><option value="pptp">PPTP</option><option value="l2tp">L2TP</option><option value="ovpn">OpenVPN</option><option value="any">Any</option>
-                  </select>
-                </div>
-                <div className="form-group"><label>Profile</label>
-                  <select value={form.profile} onChange={e => setForm({...form, profile: e.target.value})}>
-                    <option value="default">default</option>
-                    {profiles.filter(p => p.name !== 'default').map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>Remote Address</label><input type="text" value={form['remote-address']} onChange={e => setForm({...form, 'remote-address': e.target.value})} placeholder="Kosongkan untuk auto" /></div>
-                <div className="form-group"><label>Status</label>
-                  <select value={form.disabled} onChange={e => setForm({...form, disabled: e.target.value})}>
-                    <option value="no">Enabled</option><option value="yes">Disabled</option>
-                  </select>
-                </div>
-              </div>
-              <div className="form-group"><label>Comment</label><input type="text" value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} /></div>
-              <div className="form-actions"><button type="button" className="btn-cancel" onClick={() => setModal(null)}>Cancel</button><button type="submit" className="btn-submit">Simpan</button></div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CrudModal open={!!modal} title={modal?.title} wide onClose={() => setModal(null)} onSubmit={handleSubmit}>
+        <FormRow>
+          <FormGroup label="Name (Username)">
+            <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+          </FormGroup>
+          <FormGroup label="Password">
+            <input type="text" value={form.password} onChange={e => setForm({...form, password: e.target.value})} placeholder={modal?.mikrotikId ? '(kosongkan jika tidak diubah)' : ''} required={!modal?.mikrotikId} />
+          </FormGroup>
+        </FormRow>
+        <FormRow>
+          <FormGroup label="Service">
+            <select value={form.service} onChange={e => setForm({...form, service: e.target.value})}>
+              <option value="pppoe">PPPoE</option><option value="pptp">PPTP</option><option value="l2tp">L2TP</option><option value="ovpn">OpenVPN</option><option value="any">Any</option>
+            </select>
+          </FormGroup>
+          <FormGroup label="Profile">
+            <select value={form.profile} onChange={e => setForm({...form, profile: e.target.value})}>
+              <option value="default">default</option>
+              {profiles.filter(p => p.name !== 'default').map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
+            </select>
+          </FormGroup>
+        </FormRow>
+        <FormRow>
+          <FormGroup label="Remote Address">
+            <input type="text" value={form['remote-address']} onChange={e => setForm({...form, 'remote-address': e.target.value})} placeholder="Kosongkan untuk auto" />
+          </FormGroup>
+          <FormGroup label="Status">
+            <select value={form.disabled} onChange={e => setForm({...form, disabled: e.target.value})}>
+              <option value="no">Enabled</option><option value="yes">Disabled</option>
+            </select>
+          </FormGroup>
+        </FormRow>
+        <FormGroup label="Comment">
+          <input type="text" value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} />
+        </FormGroup>
+      </CrudModal>
     </div>
   )
 }

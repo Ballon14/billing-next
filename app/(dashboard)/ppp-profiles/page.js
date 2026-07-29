@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import CrudModal from '@/components/CrudModal'
+import FormGroup from '@/components/FormGroup'
+import FormRow from '@/components/FormRow'
 
 export default function PppProfilesPage() {
   const [profiles, setProfiles] = useState([])
@@ -103,26 +106,30 @@ export default function PppProfilesPage() {
         </div>
       </div>
 
-      {showModal && (
-        <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setShowModal(false)}>
-          <div className="crud-modal-content">
-            <div className="crud-modal-header"><h3>{editProfile ? 'Edit Profile' : 'Tambah Profile'}</h3><button className="crud-modal-close" onClick={() => setShowModal(false)}><i className="fas fa-xmark"></i></button></div>
-            <form className="crud-form" onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div className="form-group"><label>Name</label><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required /></div>
-                <div className="form-group"><label>Local Address</label><input value={form.localAddress} onChange={e => setForm({...form, localAddress: e.target.value})} /></div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>Remote Address</label><input value={form.remoteAddress} onChange={e => setForm({...form, remoteAddress: e.target.value})} /></div>
-                <div className="form-group"><label>Rate Limit</label><input value={form.rateLimit} onChange={e => setForm({...form, rateLimit: e.target.value})} placeholder="1M/2M" /></div>
-              </div>
-              <div className="form-group"><label>DNS Server</label><input value={form.dns} onChange={e => setForm({...form, dns: e.target.value})} /></div>
-              <div className="form-group"><label>Comment</label><input value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} /></div>
-              <div className="form-actions"><button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button><button type="submit" className="btn-submit">{editProfile ? 'Update' : 'Simpan'}</button></div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CrudModal open={showModal} title={editProfile ? 'Edit Profile' : 'Tambah Profile'} onClose={() => setShowModal(false)} onSubmit={handleSubmit} submitLabel={editProfile ? 'Update' : 'Simpan'}>
+        <FormRow>
+          <FormGroup label="Name">
+            <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+          </FormGroup>
+          <FormGroup label="Local Address">
+            <input value={form.localAddress} onChange={e => setForm({...form, localAddress: e.target.value})} />
+          </FormGroup>
+        </FormRow>
+        <FormRow>
+          <FormGroup label="Remote Address">
+            <input value={form.remoteAddress} onChange={e => setForm({...form, remoteAddress: e.target.value})} />
+          </FormGroup>
+          <FormGroup label="Rate Limit">
+            <input value={form.rateLimit} onChange={e => setForm({...form, rateLimit: e.target.value})} placeholder="1M/2M" />
+          </FormGroup>
+        </FormRow>
+        <FormGroup label="DNS Server">
+          <input value={form.dns} onChange={e => setForm({...form, dns: e.target.value})} />
+        </FormGroup>
+        <FormGroup label="Comment">
+          <input value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} />
+        </FormGroup>
+      </CrudModal>
     </div>
   )
 }

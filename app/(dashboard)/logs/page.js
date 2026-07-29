@@ -34,7 +34,7 @@ export default function LogsPage() {
   const [page, setPage] = useState(1)
 
   useEffect(() => {
-    apiFetch('/api/logs').then(setData).catch(() => {})
+    apiFetch('/api/logs').then(arr => setData([...arr].reverse())).catch(() => {})
   }, [])
 
   const totalPages = Math.max(1, Math.ceil(data.length / PAGE_SIZE))

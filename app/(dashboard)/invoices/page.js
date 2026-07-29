@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { apiPost, apiPut, apiDelete } from '@/lib/client-api.mjs'
+import CrudModal from '@/components/CrudModal'
+import FormGroup from '@/components/FormGroup'
+import FormRow from '@/components/FormRow'
 
 const PAGE_SIZE = 25
 
@@ -89,29 +92,41 @@ export default function InvoicesPage() {
         )}
       </div>
 
-      {modal && (
-        <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setModal(null)}>
-          <div className="crud-modal-content crud-modal-wide">
-            <div className="crud-modal-header"><h3>{modal.title}</h3><button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button></div>
-            <form className="crud-form" onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div className="form-group"><label>Invoice Number</label><input type="text" value={form.invoice_number} onChange={e => setForm({...form, invoice_number: e.target.value})} required /></div>
-                <div className="form-group"><label>Customer</label><select value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value})} required><option value="">— Pilih —</option>{customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>Amount</label><input type="number" step="0.01" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} required /></div>
-                <div className="form-group"><label>Due Date</label><input type="date" value={form.due_date} onChange={e => setForm({...form, due_date: e.target.value})} required /></div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>Period Start</label><input type="date" value={form.period_start} onChange={e => setForm({...form, period_start: e.target.value})} /></div>
-                <div className="form-group"><label>Period End</label><input type="date" value={form.period_end} onChange={e => setForm({...form, period_end: e.target.value})} /></div>
-              </div>
-              <div className="form-group"><label>Status</label><select value={form.status} onChange={e => setForm({...form, status: e.target.value})}><option value="unpaid">Unpaid</option><option value="paid">Paid</option></select></div>
-              <div className="form-actions"><button type="button" className="btn-cancel" onClick={() => setModal(null)}>Cancel</button><button type="submit" className="btn-submit">Simpan</button></div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CrudModal open={!!modal} title={modal?.title} wide onClose={() => setModal(null)} onSubmit={handleSubmit}>
+        <FormRow>
+          <FormGroup label="Invoice Number">
+            <input type="text" value={form.invoice_number} onChange={e => setForm({...form, invoice_number: e.target.value})} required />
+          </FormGroup>
+          <FormGroup label="Customer">
+            <select value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value})} required>
+              <option value="">— Pilih —</option>
+              {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </FormGroup>
+        </FormRow>
+        <FormRow>
+          <FormGroup label="Amount">
+            <input type="number" step="0.01" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} required />
+          </FormGroup>
+          <FormGroup label="Due Date">
+            <input type="date" value={form.due_date} onChange={e => setForm({...form, due_date: e.target.value})} required />
+          </FormGroup>
+        </FormRow>
+        <FormRow>
+          <FormGroup label="Period Start">
+            <input type="date" value={form.period_start} onChange={e => setForm({...form, period_start: e.target.value})} />
+          </FormGroup>
+          <FormGroup label="Period End">
+            <input type="date" value={form.period_end} onChange={e => setForm({...form, period_end: e.target.value})} />
+          </FormGroup>
+        </FormRow>
+        <FormGroup label="Status">
+          <select value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
+            <option value="unpaid">Unpaid</option>
+            <option value="paid">Paid</option>
+          </select>
+        </FormGroup>
+      </CrudModal>
     </div>
   )
 }

@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { apiPost, apiPut, apiDelete } from '@/lib/client-api.mjs'
+import CrudModal from '@/components/CrudModal'
+import FormGroup from '@/components/FormGroup'
+import FormRow from '@/components/FormRow'
 
 const PAGE_SIZE = 25
 const periodLabels = { weekly: 'Mingguan', monthly: 'Bulanan', quarterly: 'Triwulan', yearly: 'Tahunan' }
@@ -111,49 +114,30 @@ export default function PackagesPage() {
         )}
       </div>
 
-      {modal && (
-        <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setModal(null)}>
-          <div className="crud-modal-content">
-            <div className="crud-modal-header">
-              <h3>{modal.title}</h3>
-              <button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button>
-            </div>
-            <form className="crud-form" onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>Nama Paket</label>
-                <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Harga</label>
-                  <input type="number" step="0.01" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
-                </div>
-                <div className="form-group">
-                  <label>Speed</label>
-                  <input type="text" value={form.speed} onChange={e => setForm({...form, speed: e.target.value})} placeholder="50Mbps" />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Billing Period</label>
-                <select value={form.billing_period} onChange={e => setForm({...form, billing_period: e.target.value})}>
-                  <option value="weekly">Mingguan</option>
-                  <option value="monthly">Bulanan</option>
-                  <option value="quarterly">Triwulan</option>
-                  <option value="yearly">Tahunan</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Deskripsi</label>
-                <input type="text" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
-              </div>
-              <div className="form-actions">
-                <button type="button" className="btn-cancel" onClick={() => setModal(null)}>Cancel</button>
-                <button type="submit" className="btn-submit">Simpan</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CrudModal open={!!modal} title={modal?.title} onClose={() => setModal(null)} onSubmit={handleSubmit}>
+        <FormGroup label="Nama Paket">
+          <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+        </FormGroup>
+        <FormRow>
+          <FormGroup label="Harga">
+            <input type="number" step="0.01" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
+          </FormGroup>
+          <FormGroup label="Speed">
+            <input type="text" value={form.speed} onChange={e => setForm({...form, speed: e.target.value})} placeholder="50Mbps" />
+          </FormGroup>
+        </FormRow>
+        <FormGroup label="Billing Period">
+          <select value={form.billing_period} onChange={e => setForm({...form, billing_period: e.target.value})}>
+            <option value="weekly">Mingguan</option>
+            <option value="monthly">Bulanan</option>
+            <option value="quarterly">Triwulan</option>
+            <option value="yearly">Tahunan</option>
+          </select>
+        </FormGroup>
+        <FormGroup label="Deskripsi">
+          <input type="text" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+        </FormGroup>
+      </CrudModal>
     </div>
   )
 }

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { apiFetch, apiPost, apiPut, apiDelete } from '@/lib/client-api.mjs'
+import CrudModal from '@/components/CrudModal'
+import FormGroup from '@/components/FormGroup'
 
 const PAGE_SIZE = 25
 
@@ -126,39 +128,20 @@ export default function DhcpPage() {
         )}
       </div>
 
-      {/* CRUD Modal */}
-      {modal && (
-        <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setModal(null)}>
-          <div className="crud-modal-content">
-            <div className="crud-modal-header">
-              <h3>{modal.title}</h3>
-              <button className="crud-modal-close" onClick={() => setModal(null)}><i className="fas fa-xmark"></i></button>
-            </div>
-            <form className="crud-form" onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>IP Address</label>
-                <input type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} placeholder="192.168.1.100" required />
-              </div>
-              <div className="form-group">
-                <label>MAC Address</label>
-                <input type="text" value={form.macAddress} onChange={e => setForm({...form, macAddress: e.target.value})} placeholder="AA:BB:CC:DD:EE:FF" required />
-              </div>
-              <div className="form-group">
-                <label>Server</label>
-                <input type="text" value={form.server} onChange={e => setForm({...form, server: e.target.value})} placeholder="dhcp1" />
-              </div>
-              <div className="form-group">
-                <label>Comment</label>
-                <input type="text" value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} placeholder="Optional" />
-              </div>
-              <div className="form-actions">
-                <button type="button" className="btn-cancel" onClick={() => setModal(null)}>Cancel</button>
-                <button type="submit" className="btn-submit">Save</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CrudModal open={!!modal} title={modal?.title} onClose={() => setModal(null)} onSubmit={handleSubmit} submitLabel="Save">
+        <FormGroup label="IP Address">
+          <input type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} placeholder="192.168.1.100" required />
+        </FormGroup>
+        <FormGroup label="MAC Address">
+          <input type="text" value={form.macAddress} onChange={e => setForm({...form, macAddress: e.target.value})} placeholder="AA:BB:CC:DD:EE:FF" required />
+        </FormGroup>
+        <FormGroup label="Server">
+          <input type="text" value={form.server} onChange={e => setForm({...form, server: e.target.value})} placeholder="dhcp1" />
+        </FormGroup>
+        <FormGroup label="Comment">
+          <input type="text" value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} placeholder="Optional" />
+        </FormGroup>
+      </CrudModal>
     </div>
   )
 }

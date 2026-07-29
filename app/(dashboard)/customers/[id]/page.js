@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import CrudModal from '@/components/CrudModal'
+import FormGroup from '@/components/FormGroup'
+import FormRow from '@/components/FormRow'
 
 export default function CustomerDetailPage() {
   const { id } = useParams()
@@ -151,31 +154,49 @@ export default function CustomerDetailPage() {
         </div>
       </div>
 
-      {editing && (
-        <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setEditing(false)}>
-          <div className="crud-modal-content">
-            <div className="crud-modal-header"><h3><i className="fas fa-pen-to-square"></i> Edit Customer</h3><button className="crud-modal-close" onClick={() => setEditing(false)}><i className="fas fa-xmark"></i></button></div>
-            <form className="crud-form" onSubmit={handleSave}>
-              <div className="form-group"><label>Name</label><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required /></div>
-              <div className="form-row">
-                <div className="form-group"><label>NIK</label><input value={form.nik} onChange={e => setForm({...form, nik: e.target.value})} /></div>
-                <div className="form-group"><label>Phone</label><input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></div>
-              </div>
-              <div className="form-group"><label>Email</label><input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} /></div>
-              <div className="form-group"><label>Address</label><input value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
-              <div className="form-row">
-                <div className="form-group"><label>PPPoE Username</label><input value={form.pppoe_username} onChange={e => setForm({...form, pppoe_username: e.target.value})} required /></div>
-                <div className="form-group"><label>PPPoE Password</label><input value={form.pppoe_password} onChange={e => setForm({...form, pppoe_password: e.target.value})} required /></div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>Package</label><select value={form.package_id} onChange={e => setForm({...form, package_id: e.target.value})} required><option value="">— Pilih —</option>{packages.map(p => <option key={p.id} value={p.id}>{p.name} - Rp {Number(p.price).toLocaleString('id-ID')}</option>)}</select></div>
-                <div className="form-group"><label>Status</label><select value={form.status} onChange={e => setForm({...form, status: e.target.value})} required><option value="active">Active</option><option value="inactive">Inactive</option><option value="suspended">Suspended</option><option value="terminated">Terminated</option></select></div>
-              </div>
-              <div className="form-actions"><button type="button" className="btn-cancel" onClick={() => setEditing(false)}>Cancel</button><button type="submit" className="btn-submit">Simpan</button></div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CrudModal open={editing} title={<><i className="fas fa-pen-to-square"></i> Edit Customer</>} onClose={() => setEditing(false)} onSubmit={handleSave}>
+        <FormGroup label="Name">
+          <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+        </FormGroup>
+        <FormRow>
+          <FormGroup label="NIK">
+            <input value={form.nik} onChange={e => setForm({...form, nik: e.target.value})} />
+          </FormGroup>
+          <FormGroup label="Phone">
+            <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+          </FormGroup>
+        </FormRow>
+        <FormGroup label="Email">
+          <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+        </FormGroup>
+        <FormGroup label="Address">
+          <input value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
+        </FormGroup>
+        <FormRow>
+          <FormGroup label="PPPoE Username">
+            <input value={form.pppoe_username} onChange={e => setForm({...form, pppoe_username: e.target.value})} required />
+          </FormGroup>
+          <FormGroup label="PPPoE Password">
+            <input value={form.pppoe_password} onChange={e => setForm({...form, pppoe_password: e.target.value})} required />
+          </FormGroup>
+        </FormRow>
+        <FormRow>
+          <FormGroup label="Package">
+            <select value={form.package_id} onChange={e => setForm({...form, package_id: e.target.value})} required>
+              <option value="">— Pilih —</option>
+              {packages.map(p => <option key={p.id} value={p.id}>{p.name} - Rp {Number(p.price).toLocaleString('id-ID')}</option>)}
+            </select>
+          </FormGroup>
+          <FormGroup label="Status">
+            <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} required>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="suspended">Suspended</option>
+              <option value="terminated">Terminated</option>
+            </select>
+          </FormGroup>
+        </FormRow>
+      </CrudModal>
 
       <style jsx>{`
         .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

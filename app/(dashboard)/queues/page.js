@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import CrudModal from '@/components/CrudModal'
+import FormGroup from '@/components/FormGroup'
+import FormRow from '@/components/FormRow'
 
 export default function QueuesPage() {
   const [queues, setQueues] = useState([])
@@ -120,30 +123,38 @@ export default function QueuesPage() {
         </div>
       </div>
 
-      {showModal && (
-        <div className="crud-modal show" onClick={e => e.target.classList.contains('crud-modal') && setShowModal(false)}>
-          <div className="crud-modal-content">
-            <div className="crud-modal-header"><h3>{editQueue ? 'Edit Queue' : 'Tambah Queue'}</h3><button className="crud-modal-close" onClick={() => setShowModal(false)}><i className="fas fa-xmark"></i></button></div>
-            <form className="crud-form" onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div className="form-group"><label>Name</label><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required /></div>
-                <div className="form-group"><label>Target (IP)</label><input value={form.target} onChange={e => setForm({...form, target: e.target.value})} placeholder="10.10.10.0/24" required /></div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>Download (bps)</label><input value={form.download} onChange={e => setForm({...form, download: e.target.value})} placeholder="10M" /></div>
-                <div className="form-group"><label>Upload (bps)</label><input value={form.upload} onChange={e => setForm({...form, upload: e.target.value})} placeholder="10M" /></div>
-              </div>
-              <div className="form-row">
-                <div className="form-group"><label>Priority</label><input value={form.priority} onChange={e => setForm({...form, priority: e.target.value})} placeholder="1-8" /></div>
-                <div className="form-group"><label>Queue Type</label><input value={form.queue} onChange={e => setForm({...form, queue: e.target.value})} /></div>
-              </div>
-              <div className="form-group"><label>Comment</label><input value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} /></div>
-              <div className="form-group"><label><input type="checkbox" checked={form.disabled === 'yes'} onChange={e => setForm({...form, disabled: e.target.checked ? 'yes' : 'no'})} /> Disabled</label></div>
-              <div className="form-actions"><button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button><button type="submit" className="btn-submit">{editQueue ? 'Update' : 'Simpan'}</button></div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CrudModal open={showModal} title={editQueue ? 'Edit Queue' : 'Tambah Queue'} onClose={() => setShowModal(false)} onSubmit={handleSubmit} submitLabel={editQueue ? 'Update' : 'Simpan'}>
+        <FormRow>
+          <FormGroup label="Name">
+            <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+          </FormGroup>
+          <FormGroup label="Target (IP)">
+            <input value={form.target} onChange={e => setForm({...form, target: e.target.value})} placeholder="10.10.10.0/24" required />
+          </FormGroup>
+        </FormRow>
+        <FormRow>
+          <FormGroup label="Download (bps)">
+            <input value={form.download} onChange={e => setForm({...form, download: e.target.value})} placeholder="10M" />
+          </FormGroup>
+          <FormGroup label="Upload (bps)">
+            <input value={form.upload} onChange={e => setForm({...form, upload: e.target.value})} placeholder="10M" />
+          </FormGroup>
+        </FormRow>
+        <FormRow>
+          <FormGroup label="Priority">
+            <input value={form.priority} onChange={e => setForm({...form, priority: e.target.value})} placeholder="1-8" />
+          </FormGroup>
+          <FormGroup label="Queue Type">
+            <input value={form.queue} onChange={e => setForm({...form, queue: e.target.value})} />
+          </FormGroup>
+        </FormRow>
+        <FormGroup label="Comment">
+          <input value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} />
+        </FormGroup>
+        <FormGroup label="">
+          <label><input type="checkbox" checked={form.disabled === 'yes'} onChange={e => setForm({...form, disabled: e.target.checked ? 'yes' : 'no'})} /> Disabled</label>
+        </FormGroup>
+      </CrudModal>
     </div>
   )
 }
