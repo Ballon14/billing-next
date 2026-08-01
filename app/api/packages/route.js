@@ -32,13 +32,14 @@ export const GET = withAuth(async (req) => {
 })
 
 export const POST = withRole('SUPER_ADMIN', 'ADMIN')(validate(packageSchema)(async (req) => {
-  const { name, price, speed, description, billing_period } = req.validated
+  const { name, price, speed, profile_name, description, billing_period } = req.validated
 
   const pkg = await prisma.package.create({
     data: {
       name,
       price,
       speed: speed || null,
+      profileName: profile_name || null,
       description: description || null,
       billingPeriod: billing_period || 'monthly',
     },

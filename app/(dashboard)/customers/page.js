@@ -77,13 +77,17 @@ export default function CustomersPage() {
   }
 
   async function loadPackages() {
-    const res = await fetch('/api/packages?all=true')
-    const json = await res.json()
-    if (json.success) setPackages(json.data)
+    try {
+      const res = await fetch('/api/packages?all=true')
+      const json = await res.json()
+      if (json.success) setPackages(json.data || [])
+    } catch {
+      setPackages([])
+    }
   }
 
-  function openAdd() {
-    loadPackages()
+  async function openAdd() {
+    await loadPackages()
     setForm({ name: '', nik: '', phone: '', email: '', address: '', pppoe_username: '', pppoe_password: '', package_id: '', status: 'inactive' })
     setModal({ id: null, title: 'Tambah Pelanggan' })
   }

@@ -27,6 +27,7 @@ function readCache() {
 function writeCache(data) {
   data.updatedAt = new Date().toISOString()
   if (data.daemonHealthy === undefined) data.daemonHealthy = true
+  fs.mkdirSync(path.dirname(CACHE_FILE), { recursive: true })
   fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2))
 }
 

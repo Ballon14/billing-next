@@ -1,7 +1,12 @@
 import { success, error, withAuth, getBody } from "@/lib/api-utils.mjs"
-import { addFirewallNat, updateFirewallNat, deleteFirewallNat } from "@/lib/mikrotik-service.mjs"
+import { getFirewallNat, addFirewallNat, updateFirewallNat, deleteFirewallNat } from "@/lib/mikrotik-service.mjs"
 
 export const dynamic = 'force-dynamic'
+
+export async function GET() {
+  return success(getFirewallNat())
+}
+
 
 export const POST = withAuth(async (req) => {
   const body = await getBody(req)

@@ -77,6 +77,7 @@ model Package {
   name          String
   price         Float
   speed         String?
+  profileName   String?
   description   String?
   billingPeriod String?     @default("monthly")
   createdAt     DateTime    @default(now())

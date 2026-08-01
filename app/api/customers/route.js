@@ -74,23 +74,26 @@ export const POST = withRole('SUPER_ADMIN', 'ADMIN')(validate(customerSchema)(as
     },
   })
 
+  // Get package profile for PPPoE
+  const pkg = await prisma.package.findUnique({ where: { id: parseInt(package_id) } })
+
   const account = await prisma.pppoeAccount.create({
     data: {
       customerId: customer.id,
       username: pppoe_username,
       password: pppoe_password,
+      profile: pkg?.profileName || null,
       service: 'pppoe',
       disabled: status !== 'active',
     },
   })
 
-  if (customer.status === 'active') {
-    try {
-      const syncService = new PppoeSyncService()
-      await syncService.sync(account)
-    } catch (e) {
-      console.error('[Sync PPPoE]', e.message)
-    }
+  // Always sync to MikroTik (will be created as disabled if not active)
+  try {
+    const syncService = new PppoeSyncService()
+    await syncService.sync(account)
+  } catch (e) {
+    console.error('[Sync PPPoE]', e.message)
   }
 
   await createAuditLog({

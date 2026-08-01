@@ -17,6 +17,7 @@ export const PUT = withAuth(validatePartial(packageSchema)(async (req, { params 
       name: body.name,
       price: body.price,
       speed: body.speed || null,
+      profileName: body.profile_name !== undefined ? (body.profile_name || null) : original.profileName,
       description: body.description || null,
       billingPeriod: body.billing_period || original.billingPeriod,
     },
@@ -39,6 +40,9 @@ export const DELETE = withAuth(async (req, { params }) => {
   const p = await params; const id = parseInt(p.id)
   const pkg = await prisma.package.findUnique({ where: { id } })
   if (!pkg) return error('Package not found', 404)
+
+  const customerCount = await prisma.customer.count({ where: { packageId: id } })
+  if (customerCount > 0) return error(`Tidak bisa hapus paket, masih digunakan oleh ${customerCount} pelanggan`, 400)
 
   await prisma.package.delete({ where: { id } })
 

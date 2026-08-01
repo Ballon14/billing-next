@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { apiPost, apiPut, apiDelete } from '@/lib/client-api.mjs'
+import { apiFetch, apiPost, apiPut, apiDelete } from '@/lib/client-api.mjs'
 import CrudModal from '@/components/CrudModal'
 import FormGroup from '@/components/FormGroup'
 import FormRow from '@/components/FormRow'
@@ -14,8 +14,9 @@ export default function PackagesPage() {
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState({ name: '', price: '', speed: '', description: '', billing_period: 'monthly' })
+  const [form, setForm] = useState({ name: '', price: '', speed: '', profile_name: '', description: '', billing_period: 'monthly' })
   const [loading, setLoading] = useState(false)
+  const [profiles, setProfiles] = useState([])
 
   const load = useCallback(async (p) => {
     setLoading(true)
@@ -31,6 +32,12 @@ export default function PackagesPage() {
   }, [page])
 
   useEffect(() => { load(1) }, [])
+
+  useEffect(() => {
+    apiFetch('/api/ppp-profiles')
+      .then(p => setProfiles(p || []))
+      .catch(() => setProfiles([]))
+  }, [])
 
   const lastPage = Math.ceil(total / PAGE_SIZE)
 
@@ -54,7 +61,7 @@ export default function PackagesPage() {
   }
 
   function openEdit(pkg) {
-    setForm({ name: pkg.name, price: String(pkg.price), speed: pkg.speed || '', description: pkg.description || '', billing_period: pkg.billingPeriod || 'monthly' })
+    setForm({ name: pkg.name, price: String(pkg.price), speed: pkg.speed || '', profile_name: pkg.profileName || '', description: pkg.description || '', billing_period: pkg.billingPeriod || 'monthly' })
     setModal({ id: pkg.id, title: 'Edit Paket' })
   }
 
@@ -62,7 +69,7 @@ export default function PackagesPage() {
     <div className="card">
       <div className="card-header">
         <h3><i className="fas fa-credit-card"></i> Packages</h3>
-        <button className="btn-action btn-add" onClick={() => { setForm({ name: '', price: '', speed: '', description: '', billing_period: 'monthly' }); setModal({ id: null, title: 'Tambah Paket' }) }}>
+        <button className="btn-action btn-add" onClick={() => { setForm({ name: '', price: '', speed: '', profile_name: '', description: '', billing_period: 'monthly' }); setModal({ id: null, title: 'Tambah Paket' }) }}>
           <i className="fas fa-plus"></i> Tambah Paket
         </button>
       </div>
@@ -75,6 +82,7 @@ export default function PackagesPage() {
                 <th>Name</th>
                 <th>Price</th>
                 <th>Speed</th>
+                <th>Profile</th>
                 <th>Period</th>
                 <th>Description</th>
                 <th>Actions</th>
@@ -82,15 +90,16 @@ export default function PackagesPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={7}><div className="empty-state"><div className="empty-state-text">Loading...</div></div></td></tr>
+                <tr><td colSpan={8}><div className="empty-state"><div className="empty-state-text">Loading...</div></div></td></tr>
               ) : data.length === 0 ? (
-                <tr><td colSpan={7}><div className="empty-state"><div className="empty-state-text">Belum ada paket</div></div></td></tr>
+                <tr><td colSpan={8}><div className="empty-state"><div className="empty-state-text">Belum ada paket</div></div></td></tr>
               ) : data.map(pkg => (
                 <tr key={pkg.id}>
                   <td>{pkg.id}</td>
                   <td><strong>{pkg.name}</strong></td>
                   <td>Rp {Number(pkg.price).toLocaleString('id-ID')}</td>
                   <td>{pkg.speed || '-'}</td>
+                  <td>{pkg.profileName || '-'}</td>
                   <td>{periodLabels[pkg.billingPeriod] || pkg.billingPeriod || '-'}</td>
                   <td>{pkg.description || '-'}</td>
                   <td>
@@ -126,6 +135,14 @@ export default function PackagesPage() {
             <input type="text" value={form.speed} onChange={e => setForm({...form, speed: e.target.value})} placeholder="50Mbps" />
           </FormGroup>
         </FormRow>
+        <FormGroup label="PPP Profile (MikroTik)">
+          <select value={form.profile_name} onChange={e => setForm({...form, profile_name: e.target.value})}>
+            <option value="">— Pilih Profile —</option>
+            {profiles.map(p => (
+              <option key={p.name} value={p.name}>{p.name} {p['rate-limit'] ? `(${p['rate-limit']})` : ''}</option>
+            ))}
+          </select>
+        </FormGroup>
         <FormGroup label="Billing Period">
           <select value={form.billing_period} onChange={e => setForm({...form, billing_period: e.target.value})}>
             <option value="weekly">Mingguan</option>
