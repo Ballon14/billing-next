@@ -135,26 +135,10 @@ model Payment {
   updatedAt     DateTime @updatedAt
 }
 
-model Router {
-  id         Int           @id @default(autoincrement())
-  name       String
-  host       String
-  port       Int           @default(8728)
-  username   String
-  password   String
-  apiPort    Int?
-  isActive   Boolean       @default(true)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  pppoeAccounts PppoeAccount[]
-}
-
 model PppoeAccount {
   id          Int      @id @default(autoincrement())
   customerId  Int
   customer    Customer @relation(fields: [customerId], references: [id])
-  routerId    Int?
-  router      Router?  @relation(fields: [routerId], references: [id])
   username    String   @unique
   password    String
   profile     String?
