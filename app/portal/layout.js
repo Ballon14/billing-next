@@ -24,7 +24,15 @@ export default function PortalLayout({ children }) {
   }, [darkMode])
 
   if (status === 'loading') return null
-  if (status === 'unauthenticated') { router.push('/login'); return null }
+  if (status === 'unauthenticated') {
+    router.push('/login')
+    return null
+  }
+  
+  if (session?.user?.role === 'ADMIN') {
+    router.push('/')
+    return null
+  }
 
   const navItems = [
     { href: '/portal', label: 'Dashboard', icon: 'fa-home' },

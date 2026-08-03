@@ -2,6 +2,7 @@ import { success, error, withAuth } from "@/lib/api-utils.mjs"
 import { createAuditLog } from "@/lib/audit.mjs"
 import { PppoeSyncService } from "@/lib/pppoe-sync.mjs"
 import { validate, paymentSchema } from "@/lib/validate.mjs"
+import { unisolateIp } from "@/lib/mikrotik-service.mjs"
 import prisma from "@/lib/prisma.mjs"
 
 export const dynamic = 'force-dynamic'
@@ -58,18 +59,27 @@ async function markInvoicePaid(invoiceId) {
     })
 
     const customer = await prisma.customer.findUnique({ where: { id: invoice.customerId } })
-    if (customer && customer.status !== 'active') {
-      await prisma.customer.update({
-        where: { id: customer.id },
-        data: { status: 'active' },
-      })
+    if (customer) {
+      if (customer.status !== 'active') {
+        await prisma.customer.update({
+          where: { id: customer.id },
+          data: { status: 'active' },
+        })
+      }
+      
       const accounts = await prisma.pppoeAccount.findMany({ where: { customerId: customer.id } })
       for (const acc of accounts) {
         try {
           const syncService = new PppoeSyncService()
           await syncService.enableOnRouter(acc.username)
+          
+          // Unisolate IP if it was isolated
+          if (acc.ipAddress) {
+            await unisolateIp(acc.ipAddress)
+            console.log(`[Un-isolate] IP ${acc.ipAddress} unisolated for ${acc.username}`)
+          }
         } catch (e) {
-          console.error('[Activate]', e.message)
+          console.error('[Activate/Unisolate]', e.message)
         }
       }
     }

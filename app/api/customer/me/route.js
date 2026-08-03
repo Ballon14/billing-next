@@ -4,10 +4,16 @@ import prisma from "@/lib/prisma.mjs"
 export const dynamic = 'force-dynamic'
 
 export const GET = withAuth(async (req) => {
-  const userEmail = req.user.email
+  let customerId = req.userId
 
-  const customer = await prisma.customer.findFirst({
-    where: { email: userEmail },
+  // Jika admin, mungkin mau cari berdasarkan email atau tetap tidak bisa
+  // Untuk amannya, kita asumsikan ini endpoint khusus role CUSTOMER.
+  if (req.user.role !== 'CUSTOMER') {
+    return error('Unauthorized for this role', 403)
+  }
+
+  const customer = await prisma.customer.findUnique({
+    where: { id: customerId },
     include: {
       package: true,
       invoices: {

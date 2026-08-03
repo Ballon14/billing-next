@@ -8,7 +8,7 @@ export const POST = withAuth(async (req, { params }) => {
   const p = await params; const id = parseInt(p.id)
   const account = await prisma.pppoeAccount.findUnique({
     where: { id },
-    include: { router: true },
+
   })
   if (!account) return error('PPPoE account not found', 404)
 

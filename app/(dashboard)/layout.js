@@ -86,6 +86,11 @@ export default function DashboardLayout({ children }) {
   }, [pathname])
 
   if (status === 'loading') return null
+  
+  if (userRole === 'CUSTOMER') {
+    router.push('/portal')
+    return null
+  }
 
   const isAdmin = userRole === 'SUPER_ADMIN' || userRole === 'ADMIN'
   const isSuperAdmin = userRole === 'SUPER_ADMIN'

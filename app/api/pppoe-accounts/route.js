@@ -13,7 +13,7 @@ export const GET = withAuth(async (req) => {
   if (all) {
     const data = await prisma.pppoeAccount.findMany({
       orderBy: { id: 'desc' },
-      include: { customer: true, router: true },
+      include: { customer: true },
     })
     return success(data)
   }
@@ -27,7 +27,7 @@ export const GET = withAuth(async (req) => {
       orderBy: { id: 'desc' },
       skip,
       take: pageSize,
-      include: { customer: true, router: true },
+      include: { customer: true },
     }),
     prisma.pppoeAccount.count(),
   ])
@@ -41,12 +41,11 @@ export const GET = withAuth(async (req) => {
 })
 
 export const POST = withAuth(validate(pppoeAccountSchema)(async (req) => {
-  const { customer_id, router_id, username, password, profile, ip_address, service, disabled } = req.validated
+  const { customer_id, username, password, profile, ip_address, service, disabled } = req.validated
 
   const account = await prisma.pppoeAccount.create({
     data: {
       customerId: customer_id,
-      routerId: router_id,
       username,
       password,
       profile: profile || null,
@@ -54,7 +53,7 @@ export const POST = withAuth(validate(pppoeAccountSchema)(async (req) => {
       service: service || 'pppoe',
       disabled,
     },
-    include: { customer: true, router: true },
+    include: { customer: true },
   })
 
   if (!account.disabled) {

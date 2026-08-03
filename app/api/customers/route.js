@@ -29,7 +29,7 @@ export const GET = withAuth(async (req) => {
     const data = await prisma.customer.findMany({
       where,
       orderBy: { id: 'desc' },
-      include: { package: true, pppoeAccounts: { include: { router: true } } },
+      include: { package: true, pppoeAccounts: true },
     })
     return success(data)
   }
@@ -44,7 +44,7 @@ export const GET = withAuth(async (req) => {
       orderBy: { id: 'desc' },
       skip,
       take: pageSize,
-      include: { package: true, pppoeAccounts: { include: { router: true } } },
+      include: { package: true, pppoeAccounts: true },
     }),
     prisma.customer.count({ where }),
   ])

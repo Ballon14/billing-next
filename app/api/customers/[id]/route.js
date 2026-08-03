@@ -14,7 +14,7 @@ export const GET = withRole('SUPER_ADMIN', 'ADMIN', 'TECHNICIAN')(async (req, { 
     where: { id },
     include: {
       package: true,
-      pppoeAccounts: { include: { router: true } },
+      pppoeAccounts: true,
       invoices: { orderBy: { createdAt: 'desc' }, include: { payments: true } },
     },
   })

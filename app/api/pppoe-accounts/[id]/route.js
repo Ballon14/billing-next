@@ -13,7 +13,7 @@ export const PUT = withAuth(validatePartial(pppoeAccountSchema)(async (req, { pa
   if (!original) return error('PPPoE account not found', 404)
 
   const data = {}
-  if (body.router_id !== undefined) data.routerId = body.router_id
+
   if (body.password !== undefined) data.password = body.password
   if (body.profile !== undefined) data.profile = body.profile || null
   if (body.ip_address !== undefined) data.ipAddress = body.ip_address || null
@@ -22,7 +22,7 @@ export const PUT = withAuth(validatePartial(pppoeAccountSchema)(async (req, { pa
   const updated = await prisma.pppoeAccount.update({
     where: { id },
     data,
-    include: { customer: true, router: true },
+    include: { customer: true },
   })
 
   try {
@@ -49,7 +49,6 @@ export const DELETE = withAuth(async (req, { params }) => {
   const p = await params; const id = parseInt(p.id)
   const account = await prisma.pppoeAccount.findUnique({
     where: { id },
-    include: { router: true },
   })
   if (!account) return error('PPPoE account not found', 404)
 
