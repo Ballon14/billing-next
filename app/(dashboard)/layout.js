@@ -106,6 +106,7 @@ export default function DashboardLayout({ children }) {
       ...(isTech ? [{ href: '/queues', label: 'Bandwidth Queues', icon: 'fa-wifi' }] : []),
       ...(isTech ? [{ href: '/ppp-profiles', label: 'PPPoE Profiles', icon: 'fa-clipboard-list' }] : []),
       ...(isTech ? [{ href: '/pppoe-accounts', label: 'PPPoE Accounts', icon: 'fa-plug' }] : []),
+      ...(isSuperAdmin ? [{ href: '/users', label: 'User Management', icon: 'fa-user-shield' }] : []),
       ...(isSuperAdmin ? [{ href: '/audit-logs', label: 'Audit Logs', icon: 'fa-clipboard-list' }] : []),
     ].filter(Boolean)},
     { section: 'Monitoring', items: isTech ? [
@@ -274,6 +275,7 @@ function getPageTitle(path) {
     '/queues': 'Bandwidth Queues',
     '/ppp-profiles': 'PPPoE Profiles',
     '/pppoe-accounts': 'PPPoE Accounts',
+    '/users': 'User Management',
     '/audit-logs': 'Audit Logs',
   }
   return titles[path] || 'MikroTik Dashboard'

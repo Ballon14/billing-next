@@ -21,6 +21,7 @@ const roleAccess = {
   '/queues': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
   '/ppp-profiles': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
   '/pppoe-accounts': ['SUPER_ADMIN', 'ADMIN', 'TECHNICIAN'],
+  '/users': ['SUPER_ADMIN'],
   '/audit-logs': ['SUPER_ADMIN'],
 }
 

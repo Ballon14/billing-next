@@ -4,9 +4,10 @@ import prisma from "@/lib/prisma.mjs"
 export const dynamic = 'force-dynamic'
 
 export const GET = withAuth(async (req) => {
-  let customerId = req.userId
+  // Jika user login via akun User yang terhubung, gunakan customerId. 
+  // Jika via PPPoE, req.userId adalah ID customer (meskipun string, parseInt akan menanganinya)
+  let customerId = req.user.customerId ? parseInt(req.user.customerId) : parseInt(req.userId)
 
-  // Jika admin, mungkin mau cari berdasarkan email atau tetap tidak bisa
   // Untuk amannya, kita asumsikan ini endpoint khusus role CUSTOMER.
   if (req.user.role !== 'CUSTOMER') {
     return error('Unauthorized for this role', 403)
